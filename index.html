@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academia Huaxi — Juegos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #1A0F3C;
+      --surface: #261855;
+      --math: #FF6040;
+      --math-glow: rgba(255, 96, 64, 0.3);
+      --chinese: #4ECDC4;
+      --chinese-glow: rgba(78, 205, 196, 0.3);
+      --misc: #FFD700;
+      --misc-glow: rgba(255, 215, 0, 0.3);
+      --text: #F0EBF8;
+      --text-muted: #9A8EC0;
+      --font-display: 'Baloo 2', system-ui, sans-serif;
+      --font-body: 'Nunito', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Starfield */
+    #stars {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: white;
+      animation: twinkle var(--d, 3s) ease-in-out infinite;
+      opacity: 0;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; }
+      50% { opacity: var(--o, 0.7); }
+    }
+
+    /* Ambient orbs */
+    .orbs {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      animation: drift 22s ease-in-out infinite;
+      opacity: 0.14;
+    }
+
+    .orb-1 { width: 500px; height: 500px; background: var(--math); top: -10%; left: -8%; animation-delay: 0s; }
+    .orb-2 { width: 600px; height: 600px; background: var(--chinese); bottom: -15%; right: -12%; animation-delay: -8s; }
+    .orb-3 { width: 350px; height: 350px; background: var(--misc); top: 35%; left: 48%; animation-delay: -16s; }
+
+    @keyframes drift {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(40px, -30px) scale(1.06); }
+      66% { transform: translate(-25px, 35px) scale(0.94); }
+    }
+
+    /* Nav */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 0 2rem;
+      background: rgba(26, 15, 60, 0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .nav-logo .chinese-char {
+      color: var(--chinese);
+      font-size: 1.3rem;
+    }
+
+    .nav-logo .name-gold { color: var(--misc); }
+
+    .nav-links {
+      display: flex;
+      gap: 0.2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.875rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .nav-links a:hover { background: rgba(255,255,255,0.07); }
+    .nav-links a.math:hover { color: var(--math); }
+    .nav-links a.chinese:hover { color: var(--chinese); }
+    .nav-links a.misc:hover { color: var(--misc); }
+
+    main { position: relative; z-index: 1; }
+
+    /* Hero */
+    .hero {
+      min-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 5rem 2rem 4rem;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1.75rem;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(3.5rem, 12vw, 8rem);
+      line-height: 0.95;
+      color: var(--text);
+      margin-bottom: 1.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-title .gradient {
+      display: block;
+      background: linear-gradient(120deg, var(--math) 0%, var(--chinese) 50%, var(--misc) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      color: var(--text-muted);
+      max-width: 480px;
+      margin-bottom: 3rem;
+      line-height: 1.7;
+    }
+
+    .hero-pills {
+      display: flex;
+      gap: 0.875rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .pill {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.55rem 1.2rem;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: 1.5px solid;
+      text-decoration: none;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+    }
+
+    .pill:hover { transform: translateY(-3px); }
+    .pill.math { color: var(--math); border-color: var(--math); }
+    .pill.math:hover { box-shadow: 0 10px 30px var(--math-glow); }
+    .pill.chinese { color: var(--chinese); border-color: var(--chinese); }
+    .pill.chinese:hover { box-shadow: 0 10px 30px var(--chinese-glow); }
+    .pill.misc { color: var(--misc); border-color: var(--misc); }
+    .pill.misc:hover { box-shadow: 0 10px 30px var(--misc-glow); }
+
+    /* Sections */
+    .section {
+      padding: 5rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-icon { font-size: 2.2rem; line-height: 1; }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+    }
+
+    .accent-line {
+      width: 3rem;
+      height: 3px;
+      border-radius: 2px;
+      margin-bottom: 2.75rem;
+    }
+
+    .math-section .accent-line { background: var(--math); }
+    .chinese-section .accent-line { background: var(--chinese); }
+    .misc-section .accent-line { background: var(--misc); }
+
+    /* Game grid */
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* Game card */
+    .game-card {
+      background: var(--surface);
+      border-radius: 18px;
+      padding: 1.75rem 1.5rem 1.5rem;
+      text-decoration: none;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .game-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      border: 1.5px solid var(--accent-clr, transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .game-card:hover {
+      transform: translateY(-7px);
+      box-shadow: 0 24px 48px rgba(0,0,0,0.35), 0 0 40px var(--glow-clr, transparent);
+    }
+
+    .game-card:hover::after { opacity: 1; }
+
+    .math-section .game-card { --accent-clr: var(--math); --glow-clr: var(--math-glow); }
+    .chinese-section .game-card { --accent-clr: var(--chinese); --glow-clr: var(--chinese-glow); }
+    .misc-section .game-card { --accent-clr: var(--misc); --glow-clr: var(--misc-glow); }
+
+    .card-emoji { font-size: 2.25rem; line-height: 1; margin-bottom: 0.25rem; }
+
+    .card-tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent-clr);
+      width: fit-content;
+    }
+
+    .card-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.1rem;
+      line-height: 1.25;
+    }
+
+    .card-desc {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      flex: 1;
+    }
+
+    .card-play {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent-clr);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      opacity: 0;
+      transform: translateX(-5px);
+      transition: opacity 0.2s 0.05s, transform 0.2s 0.05s;
+    }
+
+    .game-card:hover .card-play { opacity: 1; transform: translateX(0); }
+
+    .badge-soon {
+      position: absolute;
+      top: 1.1rem;
+      right: 1.1rem;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.05);
+      padding: 0.2rem 0.45rem;
+      border-radius: 4px;
+    }
+
+    /* Dividers */
+    .section-sep {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* Footer */
+    footer {
+      position: relative;
+      z-index: 1;
+      padding: 3rem 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      margin-top: 2rem;
+    }
+
+    footer a {
+      color: var(--chinese);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    footer a:hover { text-decoration: underline; }
+
+    :focus-visible {
+      outline: 2px solid var(--misc);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .orb, .star, .game-card, .pill { animation: none; transition: none; }
+    }
+
+    @media (max-width: 640px) {
+      nav { padding: 0 1rem; }
+      .nav-links { display: none; }
+      .section { padding: 3rem 1.25rem; }
+      .game-grid { grid-template-columns: 1fr 1fr; gap: 0.875rem; }
+      .game-card { padding: 1.25rem 1rem 1rem; }
+      .card-emoji { font-size: 1.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="orbs" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<div id="stars" aria-hidden="true"></div>
+
+<nav>
+  <a href="#" class="nav-logo">
+    <span class="chinese-char">华西</span>
+    Academia <span class="name-gold">Huaxi</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#matematicas" class="math">Matemáticas</a></li>
+    <li><a href="#chino" class="chinese">Chino</a></li>
+    <li><a href="#miscelaneos" class="misc">Misceláneos</a></li>
+  </ul>
+</nav>
+
+<main>
+  <section class="hero">
+    <p class="hero-eyebrow">Academia Huaxi · Plataforma de Juegos Educativos</p>
+    <h1 class="hero-title">
+      Aprende<br>
+      <span class="gradient">Jugando</span>
+    </h1>
+    <p class="hero-subtitle">
+      Matemáticas, mandarín y más — descubre el placer de aprender a través del juego.
+    </p>
+    <div class="hero-pills">
+      <a href="#matematicas" class="pill math">🔢 Matemáticas</a>
+      <a href="#chino" class="pill chinese">汉 Chino</a>
+      <a href="#miscelaneos" class="pill misc">🎲 Misceláneos</a>
+    </div>
+  </section>
+
+  <!-- Matemáticas -->
+  <section class="section math-section" id="matematicas">
+    <p class="section-label">Categoría</p>
+    <div class="section-head">
+      <span class="section-icon">🔢</span>
+      <h2 class="section-title">Matemáticas</h2>
+    </div>
+    <div class="accent-line"></div>
+    <div class="game-grid">
+      <a href="games/matematicas/suma-rapida/" class="game-card">
+        <div class="card-emoji">⚡</div>
+        <span class="card-tag">Aritmética</span>
+        <div class="card-name">Suma Rápida</div>
+        <p class="card-desc">¿Cuántas sumas puedes resolver en 60 segundos? Pon a prueba tu velocidad.</p>
+        <div class="card-play">Jugar →</div>
+        <span class="badge-soon">Próximamente</span>
+      </a>
+      <a href="games/matematicas/tablas/" class="game-card">
+        <div class="card-emoji">✖️</div>
+        <span class="card-tag">Multiplicación</span>
+        <div class="card-name">Tablas al Vuelo</div>
+        <p class="card-desc">Domina las tablas de multiplicar con tarjetas flash y niveles de dificultad.</p>
+        <div class="card-play">Jugar →</div>
+        <span class="badge-soon">Próximamente</span>
+      </a>
+      <a href="games/matematicas/geometria/" class="game-card">
+        <div class="card-emoji">🔷</div>
+        <span class="card-tag">Geometría</span>
+        <div class="card-name">Formas y Figuras</div>
+        <p class="card-desc">Identifica, dibuja y clasifica triángulos, círculos, polígonos y más.</p>
+        <div class="card-play">Jugar →</div>
+        <span class="badge-soon">Próximamente</span>
+      </a>
+      <a href="games/matematicas/fracciones/" class="game-card">
+        <div class="card-emoji">🍕</div>
+        <span class="card-tag">Fracciones</span>
+        <div class="card-name">Fracciones Locas</div>
+        <p class="card-desc">Parte pizzas, pasteles y figuras para entender las fracciones de forma visual.</p>
+        <div class="card-play">Jugar →</div>
+        <span class="badge-soon">Próximamente</span>
+      </a>
+    </div>
+  </section>
+
+  <hr class="section-sep">
+
+  <!-- Chino -->
+  <section class="section chinese-section" id="chino">
+    <p class="section-label">Categoría</p>
+    <div class="section-head">
+      <span class="section-icon">汉</span>
+      <h2 class="section-title">Chino Mandarín</h2>
+    </div>
+    <div class="accent-line"></div>
+    <div class="game-grid">
+      <a href="games/chino/caracteres/" class="game-card">
+        <div class="card-emoji">🖊️</div>
+        <span class="card-tag">Escritura</span>
+        <div class="card-name">Trazos Básicos</div>
+        <p class="card-desc">Aprende a escribir los caracteres más comunes, trazo por trazo, paso a paso.</p>
+        <div class="card-play">Jugar →</div>
+        <span class="badge-soon">Próximamente</span>
+      </a>
+      <a href="games/chino/tonos/" class="game-card">
+        <div class="card-emoji">🎵</div>
+        <span class="card-tag">Pronunciación</span>
+        <div class="card-name">Los 4 Tonos</div>
+        <p class="card-desc">Escucha y distingue los cuatro tonos del mandarín. El secreto del buen acento.</p>
+        <div class="card-play">Jugar →</div>
+        <span class="badge-soon">Próximamente</span>
+      </a>
+      <a href="games/chino/numeros/" class="game-card">
+        <div class="card-emoji">🔢</div>
+        <span class="card-tag">Números</span>
+        <div class="card-name">一二三… Contar</div>
+        <p class="card-desc">Aprende los números del 1 al 100 en chino con juegos de asociación y ritmo.</p>
+        <div class="card-play">Jugar →</div>
+        <span class="badge-soon">Próximamente</span>
+      </a>
+      <a href="games/chino/vocabulario/" class="game-card">
+        <div class="card-emoji">📖</div>
+        <span class="card-tag">Vocabulario</span>
+        <div class="card-name">Palabras HSK 1</div>
+        <p class="card-desc">Las 150 palabras del nivel básico HSK 1, convertidas en juego de tarjetas.</p>
+        <div class="card-play">Jugar →</div>
+        <span class="badge-soon">Próximamente</span>
+      </a>
+    </div>
+  </section>
+
+  <hr class="section-sep">
+
+  <!-- Misceláneos -->
+  <section class="section misc-section" id="miscelaneos">
+    <p class="section-label">Categoría</p>
+    <div class="section-head">
+      <span class="section-icon">🎲</span>
+      <h2 class="section-title">Misceláneos</h2>
+    </div>
+    <div class="accent-line"></div>
+    <div class="game-grid">
+      <a href="games/misc/memoria/" class="game-card">
+        <div class="card-emoji">🃏</div>
+        <span class="card-tag">Memoria</span>
+        <div class="card-name">Juego de Memoria</div>
+        <p class="card-desc">Voltea las cartas y encuentra todos los pares iguales antes de que se acabe el tiempo.</p>
+        <div class="card-play">Jugar →</div>
+        <span class="badge-soon">Próximamente</span>
+      </a>
+      <a href="games/misc/rompecabezas/" class="game-card">
+        <div class="card-emoji">🧩</div>
+        <span class="card-tag">Puzzle</span>
+        <div class="card-name">Rompecabezas</div>
+        <p class="card-desc">Arma las piezas para completar ilustraciones de la academia y del mundo.</p>
+        <div class="card-play">Jugar →</div>
+        <span class="badge-soon">Próximamente</span>
+      </a>
+      <a href="games/misc/trivia/" class="game-card">
+        <div class="card-emoji">🏆</div>
+        <span class="card-tag">Trivia</span>
+        <div class="card-name">Trivia Academia</div>
+        <p class="card-desc">Preguntas de cultura general, ciencia e historia para poner a prueba tu saber.</p>
+        <div class="card-play">Jugar →</div>
+        <span class="badge-soon">Próximamente</span>
+      </a>
+      <a href="games/misc/crucigrama/" class="game-card">
+        <div class="card-emoji">📝</div>
+        <span class="card-tag">Palabras</span>
+        <div class="card-name">Crucigrama</div>
+        <p class="card-desc">Completa el crucigrama con vocabulario de matemáticas, chino y más temas.</p>
+        <div class="card-play">Jugar →</div>
+        <span class="badge-soon">Próximamente</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>Academia Huaxi Juegos &mdash; Hecho para aprender jugando</p>
+  <p style="margin-top:0.6rem;">
+    <a href="https://github.com/aprende-contento/academia-huaxi-juegos" target="_blank" rel="noopener">Ver en GitHub</a>
+  </p>
+</footer>
+
+<script>
+  // Starfield
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 140; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2.5 + 0.5;
+    s.style.cssText = [
+      `left:${Math.random()*100}%`,
+      `top:${Math.random()*100}%`,
+      `width:${size}px`,
+      `height:${size}px`,
+      `--d:${2 + Math.random()*5}s`,
+      `--o:${0.3 + Math.random()*0.65}`,
+      `animation-delay:${Math.random()*7}s`
+    ].join(';');
+    starsEl.appendChild(s);
+  }
+</script>
+
+</body>
+</html>
