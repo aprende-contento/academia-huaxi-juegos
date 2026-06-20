@@ -1,15 +1,142 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Palabras HSK 1 — Academia Huaxi</title>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>:root{--bg:#1A0F3C;--accent:#4ECDC4;--text:#F0EBF8;--text-muted:#9A8EC0;--font-display:'Baloo 2',system-ui,sans-serif;--font-body:'Nunito',system-ui,sans-serif;}*{box-sizing:border-box;margin:0;padding:0;}body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;}.emoji{font-size:4rem;margin-bottom:1.5rem;}h1{font-family:var(--font-display);font-weight:800;font-size:2.5rem;color:var(--accent);margin-bottom:0.75rem;}p{color:var(--text-muted);font-size:1rem;max-width:380px;line-height:1.6;margin-bottom:2rem;}a{display:inline-flex;align-items:center;gap:0.4rem;padding:0.65rem 1.4rem;border-radius:10px;background:rgba(78,205,196,0.1);color:var(--accent);font-weight:700;font-size:0.9rem;text-decoration:none;border:1.5px solid var(--accent);transition:background 0.2s;}a:hover{background:rgba(78,205,196,0.2);}</style>
+  <style>
+    :root {
+      --bg: #F4EFFF; --surface: #FFFFFF;
+      --accent: #1E9A92;
+      --text: #1A0F3C; --text-muted: #6B5B95;
+      --font-display: 'Baloo 2', system-ui, sans-serif;
+      --font-body: 'Nunito', system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); overflow-x: hidden; line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
+    #stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    .star { position: absolute; border-radius: 50%; background: rgba(107, 91, 149, 0.45); animation: twinkle var(--d, 3s) ease-in-out infinite; opacity: 0; }
+    @keyframes twinkle { 0%, 100% { opacity: 0; } 50% { opacity: var(--o, 0.7); } }
+    .orbs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(90px); animation: drift 22s ease-in-out infinite; opacity: 0.14; }
+    .orb-1 { width: 500px; height: 500px; background: #FF6040; top: -10%; left: -8%; animation-delay: 0s; }
+    .orb-2 { width: 600px; height: 600px; background: #4ECDC4; bottom: -15%; right: -12%; animation-delay: -8s; }
+    .orb-3 { width: 350px; height: 350px; background: #FFD700; top: 35%; left: 48%; animation-delay: -16s; }
+    @keyframes drift { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(40px, -30px) scale(1.06); } 66% { transform: translate(-25px, 35px) scale(0.94); } }
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      padding: 0 2rem;
+      background: rgba(26, 15, 60, 0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo-img { display: flex; align-items: center; text-decoration: none; transition: opacity 0.2s; }
+    .nav-logo-img:hover { opacity: 0.85; }
+    .nav-logo-img img { height: 32px; width: auto; display: block; }
+    .nav-links { display: flex; gap: 0.2rem; list-style: none; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-weight: 700; font-size: 0.875rem; padding: 0.4rem 0.8rem; border-radius: 8px; transition: color 0.2s, background 0.2s; }
+    .nav-links a:hover { background: rgba(255,255,255,0.07); }
+    .nav-links a.math:hover { color: #FF6040; }
+    .nav-links a.chinese:hover { color: #4ECDC4; }
+    .nav-links a.misc:hover { color: #FFD700; }
+    main { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 4rem 2rem; }
+    .game-emoji { font-size: 4rem; line-height: 1; margin-bottom: 1.5rem; }
+    h1 { font-family: var(--font-display); font-weight: 800; font-size: 2.5rem; color: var(--accent); margin-bottom: 0.75rem; }
+    p { color: var(--text-muted); font-size: 1rem; max-width: 380px; line-height: 1.6; margin-bottom: 2rem; }
+    .back-link {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.65rem 1.4rem; border-radius: 10px;
+      background: transparent; color: var(--accent);
+      font-weight: 700; font-size: 0.9rem; text-decoration: none;
+      border: 1.5px solid var(--accent);
+      transition: background 0.2s;
+    }
+    .back-link:hover { background: rgba(255,255,255,0.05); }
+    footer {
+      position: relative; z-index: 1;
+      padding: 3.5rem 2rem 3rem; text-align: center;
+      color: var(--text-muted); font-size: 0.85rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .footer-top { display: flex; align-items: flex-start; justify-content: center; gap: 4rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+    .footer-school-logo { display: inline-block; }
+    .footer-school-logo img { height: 48px; width: auto; display: block; }
+    .footer-wx-block { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
+    .footer-wx-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+    .footer-wx-qr { background: white; border-radius: 10px; padding: 8px; display: inline-block; }
+    .footer-wx-qr img { width: 96px; height: 96px; display: block; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem; }
+    :focus-visible { outline: 2px solid #FFD700; outline-offset: 3px; border-radius: 6px; }
+    @media (prefers-reduced-motion: reduce) { .orb, .star { animation: none; } * { transition: none !important; } }
+    @media (max-width: 640px) { nav { padding: 0 1rem; } .nav-links { display: none; } }
+  </style>
 </head>
 <body>
-  <div class="emoji">📖</div>
+
+<div class="orbs" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<div id="stars" aria-hidden="true"></div>
+
+<nav>
+  <a href="../../../index.html" class="nav-logo-img">
+    <img src="../../../school-logo.jpg" alt="Academia Hua Xi Idioma Chino">
+  </a>
+  <ul class="nav-links">
+    <li><a href="../../../index.html#matematicas" class="math">Matemáticas</a></li>
+    <li><a href="../../../index.html#chino" class="chinese">Chino</a></li>
+    <li><a href="../../../index.html#miscelaneos" class="misc">Misceláneos</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="game-emoji">📖</div>
   <h1>Palabras HSK 1</h1>
   <p>Este juego está en construcción. Pronto podrás practicar las 150 palabras del HSK 1 en modo juego.</p>
-  <a href="../../..">← Volver al inicio</a>
+  <a href="../../../index.html" class="back-link">← Volver al inicio</a>
+</main>
+
+<footer>
+  <div class="footer-top">
+    <div class="footer-school-logo">
+      <img src="../../../school-logo.jpg" alt="Academia Hua Xi Idioma Chino">
+    </div>
+    <div class="footer-wx-block">
+      <span class="footer-wx-label">Contáctanos en WeChat</span>
+      <div class="footer-wx-qr">
+        <img src="../../../wx-logo.png" alt="Código QR de WeChat">
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Academia Huaxi Juegos &mdash; Hecho para aprender jugando</p>
+  </div>
+</footer>
+
+<script>
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 140; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2.5 + 0.5;
+    s.style.cssText = [
+      `left:${Math.random()*100}%`,
+      `top:${Math.random()*100}%`,
+      `width:${size}px`,
+      `height:${size}px`,
+      `--d:${2 + Math.random()*5}s`,
+      `--o:${0.3 + Math.random()*0.65}`,
+      `animation-delay:${Math.random()*7}s`
+    ].join(';');
+    starsEl.appendChild(s);
+  }
+</script>
+
 </body>
 </html>

@@ -6,20 +6,429 @@
   <title>Tablas al Vuelo — Academia Huaxi</title>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --bg:#1A0F3C;--surface:#261855;--accent:#FF6040;--text:#F0EBF8;--text-muted:#9A8EC0;--font-display:'Baloo 2',system-ui,sans-serif;--font-body:'Nunito',system-ui,sans-serif; }
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;}
-    .emoji{font-size:4rem;margin-bottom:1.5rem;}
-    h1{font-family:var(--font-display);font-weight:800;font-size:2.5rem;color:var(--accent);margin-bottom:0.75rem;}
-    p{color:var(--text-muted);font-size:1rem;max-width:380px;line-height:1.6;margin-bottom:2rem;}
-    a{display:inline-flex;align-items:center;gap:0.4rem;padding:0.65rem 1.4rem;border-radius:10px;background:rgba(255,96,64,0.12);color:var(--accent);font-weight:700;font-size:0.9rem;text-decoration:none;border:1.5px solid var(--accent);transition:background 0.2s;}
-    a:hover{background:rgba(255,96,64,0.22);}
+    :root {
+      --bg: #F4EFFF; --surface: #FFFFFF;
+      --accent: #D94F30; --accent-glow: rgba(217, 79, 48, 0.15);
+      --text: #1A0F3C; --text-muted: #6B5B95;
+      --green: #52D98A; --red: #FF4560;
+      --font-display: 'Baloo 2', system-ui, sans-serif;
+      --font-body: 'Nunito', system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: var(--font-body); overflow-x: hidden;
+      line-height: 1.6; min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+
+    /* Background */
+    #stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    .star { position: absolute; border-radius: 50%; background: rgba(107, 91, 149, 0.45); animation: twinkle var(--d, 3s) ease-in-out infinite; opacity: 0; }
+    @keyframes twinkle { 0%, 100% { opacity: 0; } 50% { opacity: var(--o, 0.7); } }
+    .orbs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(90px); animation: drift 22s ease-in-out infinite; opacity: 0.14; }
+    .orb-1 { width: 500px; height: 500px; background: #FF6040; top: -10%; left: -8%; animation-delay: 0s; }
+    .orb-2 { width: 600px; height: 600px; background: #4ECDC4; bottom: -15%; right: -12%; animation-delay: -8s; }
+    .orb-3 { width: 350px; height: 350px; background: #FFD700; top: 35%; left: 48%; animation-delay: -16s; }
+    @keyframes drift { 0%, 100% { transform: translate(0,0) scale(1); } 33% { transform: translate(40px,-30px) scale(1.06); } 66% { transform: translate(-25px,35px) scale(0.94); } }
+
+    /* Nav */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      padding: 0 2rem;
+      background: rgba(26, 15, 60, 0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo-img { display: flex; align-items: center; text-decoration: none; transition: opacity 0.2s; }
+    .nav-logo-img:hover { opacity: 0.85; }
+    .nav-logo-img img { height: 32px; width: auto; display: block; }
+    .nav-links { display: flex; gap: 0.2rem; list-style: none; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-weight: 700; font-size: 0.875rem; padding: 0.4rem 0.8rem; border-radius: 8px; transition: color 0.2s, background 0.2s; }
+    .nav-links a:hover { background: rgba(255,255,255,0.07); }
+    .nav-links a.math:hover { color: #FF6040; }
+    .nav-links a.chinese:hover { color: #4ECDC4; }
+    .nav-links a.misc:hover { color: #FFD700; }
+
+    /* Main */
+    main { position: relative; z-index: 1; flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+
+    /* Game screens */
+    .screen { display: none; flex-direction: column; align-items: center; text-align: center; }
+    .screen.active { display: flex; }
+
+    /* START SCREEN */
+    .start-emoji { font-size: 4rem; margin-bottom: 1.25rem; }
+    .start-title {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2rem, 6vw, 3rem);
+      color: var(--accent); margin-bottom: 0.75rem;
+    }
+    .start-desc { color: var(--text-muted); max-width: 340px; line-height: 1.7; margin-bottom: 0.5rem; font-size: 1rem; }
+    .start-rules { display: flex; gap: 1rem; margin: 1.5rem 0 2rem; flex-wrap: wrap; justify-content: center; }
+    .rule-chip {
+      background: rgba(255,96,64,0.1);
+      border: 1px solid rgba(255,96,64,0.25);
+      border-radius: 8px; padding: 0.5rem 1rem;
+      font-size: 0.85rem; font-weight: 700; color: var(--accent);
+    }
+    .btn-start {
+      background: var(--accent); color: white; border: none; border-radius: 12px;
+      font-family: var(--font-display); font-weight: 800; font-size: 1.2rem;
+      padding: 0.85rem 2.5rem; cursor: pointer;
+      box-shadow: 0 8px 30px var(--accent-glow);
+      transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
+    }
+    .btn-start:hover { transform: translateY(-3px); box-shadow: 0 14px 40px var(--accent-glow); }
+
+    /* PLAY SCREEN */
+    .hud {
+      display: flex; align-items: center; justify-content: space-between;
+      width: min(480px, 90vw); margin-bottom: 1.5rem;
+    }
+    .hud-timer {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: 1.6rem; color: var(--text);
+      display: flex; align-items: center; gap: 0.3rem;
+      transition: color 0.3s;
+    }
+    .hud-timer.urgent { color: var(--red); animation: blink 0.8s ease-in-out infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+    .hud-score {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: 1.1rem; color: var(--text-muted);
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .hud-score .score-num { font-size: 1.6rem; color: var(--green); }
+
+    .game-card {
+      background: var(--surface); border-radius: 24px;
+      padding: 2.5rem 3rem; width: min(480px, 90vw);
+      border: 1.5px solid rgba(255,255,255,0.06);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .game-card.correct {
+      border-color: var(--green);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4), 0 0 40px rgba(82,217,138,0.2);
+    }
+    .game-card.wrong { animation: shake 0.35s ease; }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+
+    .equation {
+      display: flex; align-items: center; justify-content: center;
+      gap: 1rem; margin-bottom: 2rem;
+    }
+    .eq-num {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(3rem, 10vw, 5rem);
+      color: var(--accent); line-height: 1;
+    }
+    .eq-sym {
+      font-family: var(--font-display); font-weight: 400;
+      font-size: clamp(2.5rem, 8vw, 4rem);
+      color: var(--text-muted); line-height: 1;
+    }
+
+    #answer-input {
+      width: 100%; text-align: center;
+      background: rgba(255,255,255,0.06);
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 12px; color: var(--text);
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2rem, 6vw, 3rem);
+      padding: 0.6rem 1rem; outline: none;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+      caret-color: var(--accent);
+      -moz-appearance: textfield;
+    }
+    #answer-input::-webkit-outer-spin-button,
+    #answer-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    #answer-input:focus { border-color: var(--accent); background: rgba(255,96,64,0.07); }
+    #answer-input.correct-flash { border-color: var(--green); background: rgba(82,217,138,0.08); color: var(--green); }
+
+    .feedback {
+      margin-top: 1rem; height: 1.4rem;
+      font-size: 0.85rem; font-weight: 700;
+      letter-spacing: 0.04em; color: transparent;
+      transition: color 0.15s;
+    }
+    .feedback.ok { color: var(--green); }
+    .feedback.err { color: var(--red); }
+
+    /* RESULT SCREEN */
+    .result-emoji { font-size: 4rem; margin-bottom: 1rem; }
+    .result-title {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: 1.5rem; color: var(--text-muted); margin-bottom: 0.5rem;
+    }
+    .result-score {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(5rem, 18vw, 8rem);
+      color: var(--accent); line-height: 1; margin-bottom: 0.25rem;
+    }
+    .result-label { font-size: 1rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+    .result-detail { font-size: 0.85rem; color: var(--text-muted); opacity: 0.7; margin-bottom: 2rem; }
+    .result-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    .btn-retry {
+      background: var(--accent); color: white; border: none; border-radius: 12px;
+      font-family: var(--font-display); font-weight: 800; font-size: 1.1rem;
+      padding: 0.75rem 2rem; cursor: pointer;
+      box-shadow: 0 8px 30px var(--accent-glow);
+      transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .btn-retry:hover { transform: translateY(-3px); }
+    .btn-home {
+      background: transparent; color: var(--text-muted);
+      border: 1.5px solid rgba(255,255,255,0.15); border-radius: 12px;
+      font-family: var(--font-body); font-weight: 700; font-size: 0.95rem;
+      padding: 0.75rem 1.5rem; cursor: pointer;
+      text-decoration: none; display: inline-flex; align-items: center;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-home:hover { border-color: rgba(255,255,255,0.35); color: var(--text); }
+
+    /* Footer */
+    footer {
+      position: relative; z-index: 1;
+      padding: 3.5rem 2rem 3rem; text-align: center;
+      color: var(--text-muted); font-size: 0.85rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .footer-top { display: flex; align-items: flex-start; justify-content: center; gap: 4rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+    .footer-school-logo { display: inline-block; }
+    .footer-school-logo img { height: 48px; width: auto; display: block; }
+    .footer-wx-block { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
+    .footer-wx-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+    .footer-wx-qr { background: white; border-radius: 10px; padding: 8px; display: inline-block; }
+    .footer-wx-qr img { width: 96px; height: 96px; display: block; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem; }
+    :focus-visible { outline: 2px solid #FFD700; outline-offset: 3px; border-radius: 6px; }
+    @media (prefers-reduced-motion: reduce) { .orb, .star { animation: none; } * { transition: none !important; } }
+    @media (max-width: 640px) {
+      nav { padding: 0 1rem; }
+      .nav-links { display: none; }
+      .game-card { padding: 2rem 1.25rem; }
+    }
   </style>
 </head>
 <body>
-  <div class="emoji">✖️</div>
-  <h1>Tablas al Vuelo</h1>
-  <p>Este juego está en construcción. Pronto podrás dominar las tablas de multiplicar con tarjetas flash.</p>
-  <a href="../../..">← Volver al inicio</a>
+
+<div class="orbs" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<div id="stars" aria-hidden="true"></div>
+
+<nav>
+  <a href="../../../index.html" class="nav-logo-img">
+    <img src="../../../school-logo.jpg" alt="Academia Hua Xi Idioma Chino">
+  </a>
+  <ul class="nav-links">
+    <li><a href="../../../index.html#matematicas" class="math">Matemáticas</a></li>
+    <li><a href="../../../index.html#chino" class="chinese">Chino</a></li>
+    <li><a href="../../../index.html#miscelaneos" class="misc">Misceláneos</a></li>
+  </ul>
+</nav>
+
+<main>
+
+  <!-- START -->
+  <div class="screen active" id="screen-start">
+    <div class="start-emoji">✖️</div>
+    <h1 class="start-title">Tablas al Vuelo</h1>
+    <p class="start-desc">Se mostrarán dos números del 1 al 9. Escribe el resultado de multiplicarlos lo más rápido que puedas.</p>
+    <div class="start-rules">
+      <div class="rule-chip">⏱ 2 minutos</div>
+      <div class="rule-chip">🔢 Del 1 al 9</div>
+      <div class="rule-chip">✓ Cuenta tus aciertos</div>
+    </div>
+    <button class="btn-start" onclick="startGame()">Empezar</button>
+  </div>
+
+  <!-- PLAY -->
+  <div class="screen" id="screen-play">
+    <div class="hud">
+      <div class="hud-timer" id="hud-timer">⏱ 2:00</div>
+      <div class="hud-score">✓ <span class="score-num" id="hud-score">0</span></div>
+    </div>
+    <div class="game-card" id="game-card">
+      <div class="equation">
+        <span class="eq-num" id="num-a">3</span>
+        <span class="eq-sym">×</span>
+        <span class="eq-num" id="num-b">7</span>
+        <span class="eq-sym">=</span>
+      </div>
+      <input
+        type="number"
+        id="answer-input"
+        inputmode="numeric"
+        min="1" max="81"
+        autocomplete="off"
+        placeholder="?"
+        aria-label="Tu respuesta"
+      >
+      <div class="feedback" id="feedback"></div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="screen-result">
+    <div class="result-emoji" id="result-emoji">🏆</div>
+    <div class="result-title">¡Tiempo!</div>
+    <div class="result-score" id="result-score">0</div>
+    <div class="result-label">respuestas correctas</div>
+    <div class="result-detail" id="result-detail"></div>
+    <div class="result-actions">
+      <button class="btn-retry" onclick="startGame()">Jugar de nuevo</button>
+      <a href="../../../index.html" class="btn-home">← Volver al inicio</a>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-top">
+    <div class="footer-school-logo">
+      <img src="../../../school-logo.jpg" alt="Academia Hua Xi Idioma Chino">
+    </div>
+    <div class="footer-wx-block">
+      <span class="footer-wx-label">Contáctanos en WeChat</span>
+      <div class="footer-wx-qr">
+        <img src="../../../wx-logo.png" alt="Código QR de WeChat">
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Academia Huaxi Juegos &mdash; Hecho para aprender jugando</p>
+  </div>
+</footer>
+
+<script>
+  // Starfield
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 140; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2.5 + 0.5;
+    s.style.cssText = [
+      `left:${Math.random()*100}%`, `top:${Math.random()*100}%`,
+      `width:${sz}px`, `height:${sz}px`,
+      `--d:${2 + Math.random()*5}s`,
+      `--o:${0.3 + Math.random()*0.65}`,
+      `animation-delay:${Math.random()*7}s`
+    ].join(';');
+    starsEl.appendChild(s);
+  }
+
+  // Game
+  let numA, numB, score, timeLeft, timerInterval, advancing;
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function startGame() {
+    score = 0;
+    timeLeft = 120;
+    advancing = false;
+    clearInterval(timerInterval);
+    updateHUD();
+    showScreen('screen-play');
+    nextQuestion();
+    timerInterval = setInterval(tick, 1000);
+  }
+
+  function tick() {
+    timeLeft--;
+    updateHUD();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      endGame();
+    }
+  }
+
+  function updateHUD() {
+    const m = Math.floor(timeLeft / 60);
+    const s = String(timeLeft % 60).padStart(2, '0');
+    const el = document.getElementById('hud-timer');
+    el.textContent = `⏱ ${m}:${s}`;
+    el.classList.toggle('urgent', timeLeft <= 30);
+    document.getElementById('hud-score').textContent = score;
+  }
+
+  function nextQuestion() {
+    advancing = false;
+    numA = Math.floor(Math.random() * 9) + 1;
+    numB = Math.floor(Math.random() * 9) + 1;
+    document.getElementById('num-a').textContent = numA;
+    document.getElementById('num-b').textContent = numB;
+    const inp = document.getElementById('answer-input');
+    inp.value = '';
+    inp.classList.remove('correct-flash');
+    inp.removeAttribute('disabled');
+    inp.focus();
+    const card = document.getElementById('game-card');
+    card.classList.remove('correct', 'wrong');
+    const fb = document.getElementById('feedback');
+    fb.textContent = '';
+    fb.className = 'feedback';
+  }
+
+  function endGame() {
+    showScreen('screen-result');
+    document.getElementById('result-score').textContent = score;
+    let emoji, detail;
+    if (score >= 40)      { emoji = '🏆'; detail = '¡Increíble! Eres un campeón de las tablas.'; }
+    else if (score >= 25) { emoji = '⭐'; detail = '¡Muy bien! Sigue practicando.'; }
+    else if (score >= 10) { emoji = '💪'; detail = '¡Buen intento! Cada vez mejor.'; }
+    else                  { emoji = '📚'; detail = 'Sigue practicando, ¡tú puedes!'; }
+    document.getElementById('result-emoji').textContent = emoji;
+    document.getElementById('result-detail').textContent = detail;
+  }
+
+  // Auto-advance when correct answer is typed
+  document.getElementById('answer-input').addEventListener('input', function() {
+    if (advancing) return;
+    const val = parseInt(this.value, 10);
+    if (isNaN(val) || this.value === '') return;
+    if (val === numA * numB) {
+      advancing = true;
+      score++;
+      updateHUD();
+      this.classList.add('correct-flash');
+      this.setAttribute('disabled', 'true');
+      document.getElementById('game-card').classList.add('correct');
+      const fb = document.getElementById('feedback');
+      fb.textContent = `✓ ${numA} × ${numB} = ${numA * numB}`;
+      fb.className = 'feedback ok';
+      setTimeout(nextQuestion, 650);
+    }
+  });
+
+  // Enter to flag wrong answer
+  document.getElementById('answer-input').addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter' || advancing) return;
+    const val = parseInt(this.value, 10);
+    if (isNaN(val) || this.value === '') return;
+    if (val !== numA * numB) {
+      const card = document.getElementById('game-card');
+      card.classList.remove('wrong');
+      void card.offsetWidth;
+      card.classList.add('wrong');
+      const fb = document.getElementById('feedback');
+      fb.textContent = '✗ Inténtalo de nuevo';
+      fb.className = 'feedback err';
+      this.value = '';
+    }
+  });
+</script>
+
 </body>
 </html>
