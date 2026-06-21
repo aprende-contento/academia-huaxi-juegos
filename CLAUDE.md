@@ -23,16 +23,16 @@ Every page in this repo — the hub (`index.html`) and all game pages under `gam
 
 ```css
 :root {
-  --bg: #1A0F3C;               /* Deep cosmic purple — page background */
-  --surface: #261855;           /* Card / panel background */
-  --math: #FF6040;              /* Matemáticas accent (coral-orange) */
-  --math-glow: rgba(255, 96, 64, 0.3);
-  --chinese: #4ECDC4;           /* Chino accent (jade teal) */
-  --chinese-glow: rgba(78, 205, 196, 0.3);
-  --misc: #FFD700;              /* Misceláneos accent (gold) */
-  --misc-glow: rgba(255, 215, 0, 0.3);
-  --text: #F0EBF8;              /* Primary text */
-  --text-muted: #9A8EC0;        /* Secondary / label text */
+  --bg: #F4EFFF;               /* Light lavender — page background */
+  --surface: #FFFFFF;           /* Card / panel background */
+  --math: #D94F30;              /* Matemáticas accent (deep coral) */
+  --math-glow: rgba(217, 79, 48, 0.15);
+  --chinese: #1E9A92;           /* Chino accent (deep teal) */
+  --chinese-glow: rgba(30, 154, 146, 0.15);
+  --misc: #B8900A;              /* Misceláneos accent (deep gold) */
+  --misc-glow: rgba(184, 144, 10, 0.15);
+  --text: #1A0F3C;              /* Primary text (dark on light bg) */
+  --text-muted: #6B5B95;        /* Secondary / label text */
   --font-display: 'Baloo 2', system-ui, sans-serif;
   --font-body: 'Nunito', system-ui, sans-serif;
 }
@@ -93,7 +93,7 @@ CSS for stars and orbs (include in every page):
   pointer-events: none; z-index: 0;
 }
 .star {
-  position: absolute; border-radius: 50%; background: white;
+  position: absolute; border-radius: 50%; background: rgba(107, 91, 149, 0.45);
   animation: twinkle var(--d, 3s) ease-in-out infinite; opacity: 0;
 }
 @keyframes twinkle {
@@ -124,14 +124,14 @@ CSS for stars and orbs (include in every page):
 ### Logo assets
 
 Two logo files live in the repo root:
-- `school-logo.jpg` — the school seal + "华西书院 / ACADEMIA HUA XI IDIOMA CHINO" wordmark. White background. Always mount inside a white rounded container so it reads on the dark page background.
+- `school-logo.jpg` — the school seal + "华西书院 / ACADEMIA HUA XI IDIOMA CHINO" wordmark. White background. Render directly without any wrapper in both nav and footer — the light page background makes it legible.
 - `wx-logo.png` — WeChat QR code (black on white). Always mount inside a white rounded container. Label: "Contáctanos en WeChat".
 
 When referencing logos from a game page, use a relative path: `../../../school-logo.jpg` (3 levels up from `games/categoria/juego/`). From `index.html` in the root, use `school-logo.jpg` directly.
 
 ### Navigation (required on every page)
 
-Sticky nav, height 64px, blurred dark background. The logo links back to the hub (`/` or `../../..` depending on depth).
+Sticky nav, height 64px, blurred light lavender background (slightly darker than the page body). The logo links back to the hub (`/` or `../../..` depending on depth).
 
 ```html
 <nav>
@@ -159,9 +159,6 @@ Nav CSS:
 
 ```css
 .nav-logo-img {
-  background: white;
-  border-radius: 8px;
-  padding: 4px 10px;
   display: flex; align-items: center;
   text-decoration: none;
   transition: opacity 0.2s;
@@ -172,9 +169,9 @@ Nav CSS:
 nav {
   position: sticky; top: 0; z-index: 100;
   padding: 0 2rem;
-  background: rgba(26, 15, 60, 0.85);
+  background: rgba(220, 210, 245, 0.95);
   backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid rgba(107, 91, 149, 0.15);
   display: flex; align-items: center; justify-content: space-between;
   height: 64px;
 }
@@ -191,7 +188,7 @@ nav {
   font-size: 0.875rem; padding: 0.4rem 0.8rem; border-radius: 8px;
   transition: color 0.2s, background 0.2s;
 }
-.nav-links a:hover { background: rgba(255,255,255,0.07); }
+.nav-links a:hover { background: rgba(107, 91, 149, 0.08); }
 .nav-links a.math:hover { color: var(--math); }
 .nav-links a.chinese:hover { color: var(--chinese); }
 .nav-links a.misc:hover { color: var(--misc); }
@@ -238,7 +235,7 @@ footer {
   margin-top: 2rem;
 }
 .footer-top { display: flex; align-items: flex-start; justify-content: center; gap: 4rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
-.footer-school-logo { background: white; border-radius: 10px; padding: 8px 16px; display: inline-block; }
+.footer-school-logo { display: inline-block; }
 .footer-school-logo img { height: 48px; width: auto; display: block; }
 .footer-wx-block { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
 .footer-wx-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
@@ -323,9 +320,9 @@ New games go inside the appropriate category folder as `games/{categoria}/{slug}
 
 | Category | CSS var | Hex | Usage |
 |---|---|---|---|
-| Matemáticas | `--math` | `#FF6040` | Accent, glow, tags, interactive elements |
-| Chino Mandarín | `--chinese` | `#4ECDC4` | Accent, glow, tags, interactive elements |
-| Misceláneos | `--misc` | `#FFD700` | Accent, glow, tags, interactive elements |
+| Matemáticas | `--math` | `#D94F30` | Accent, glow, tags, interactive elements |
+| Chino Mandarín | `--chinese` | `#1E9A92` | Accent, glow, tags, interactive elements |
+| Misceláneos | `--misc` | `#B8900A` | Accent, glow, tags, interactive elements |
 
 ---
 
@@ -333,7 +330,7 @@ New games go inside the appropriate category folder as `games/{categoria}/{slug}
 
 - Do not use any color outside the token system above.
 - Do not use any font other than Baloo 2 and Nunito.
-- Do not use light backgrounds — every page background is `var(--bg)` (#1A0F3C).
+- Do not use dark backgrounds — the page background is the light lavender `var(--bg)` (#F4EFFF).
 - Do not omit the starfield or ambient orbs from any page.
 - Do not omit the nav or footer from any page.
 - Do not write UI copy in English — everything is in Spanish.
