@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dominó de Palabras — Academia Huaxi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #1A0F3C;
+      --surface: #261855;
+      --math: #FF6040;
+      --math-glow: rgba(255, 96, 64, 0.3);
+      --chinese: #4ECDC4;
+      --chinese-glow: rgba(78, 205, 196, 0.3);
+      --misc: #FFD700;
+      --misc-glow: rgba(255, 215, 0, 0.3);
+      --text: #F0EBF8;
+      --text-muted: #9A8EC0;
+      --font-display: 'Baloo 2', system-ui, sans-serif;
+      --font-body: 'Nunito', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    main { position: relative; z-index: 1; }
+    :focus-visible { outline: 2px solid var(--misc); outline-offset: 3px; border-radius: 6px; }
+
+    #stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    .star { position: absolute; border-radius: 50%; background: white; animation: twinkle var(--d, 3s) ease-in-out infinite; opacity: 0; }
+    @keyframes twinkle { 0%, 100% { opacity: 0; } 50% { opacity: var(--o, 0.7); } }
+    .orbs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(90px); animation: drift 22s ease-in-out infinite; opacity: 0.14; }
+    .orb-1 { width: 500px; height: 500px; background: var(--chinese); top: -10%; left: -8%; animation-delay: 0s; }
+    .orb-2 { width: 600px; height: 600px; background: var(--misc); bottom: -15%; right: -12%; animation-delay: -8s; }
+    .orb-3 { width: 350px; height: 350px; background: var(--math); top: 35%; left: 48%; animation-delay: -16s; }
+    @keyframes drift { 0%, 100% { transform: translate(0,0) scale(1); } 33% { transform: translate(40px,-30px) scale(1.06); } 66% { transform: translate(-25px,35px) scale(0.94); } }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      padding: 0 2rem;
+      background: rgba(26, 15, 60, 0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo-img { background: white; border-radius: 8px; padding: 4px 10px; display: flex; align-items: center; text-decoration: none; transition: opacity 0.2s; }
+    .nav-logo-img:hover { opacity: 0.85; }
+    .nav-logo-img img { height: 32px; width: auto; display: block; }
+    .nav-links { display: flex; gap: 0.2rem; list-style: none; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-weight: 700; font-size: 0.875rem; padding: 0.4rem 0.8rem; border-radius: 8px; transition: color 0.2s, background 0.2s; }
+    .nav-links a:hover { background: rgba(255,255,255,0.07); }
+    .nav-links a.math:hover { color: var(--math); }
+    .nav-links a.chinese:hover { color: var(--chinese); }
+    .nav-links a.misc:hover { color: var(--misc); }
+    @media (max-width: 640px) { nav { padding: 0 1rem; } .nav-links { display: none; } }
+
+    /* ── Game layout ── */
+    .game-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    .game-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .game-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      color: var(--chinese);
+      margin-bottom: 0.4rem;
+    }
+
+    .game-subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* ── Chain area ── */
+    .chain-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .chain-area {
+      background: rgba(78, 205, 196, 0.05);
+      border: 2px dashed rgba(78, 205, 196, 0.3);
+      border-radius: 16px;
+      min-height: 140px;
+      padding: 1.25rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      transition: background 0.2s, border-color 0.2s;
+      position: relative;
+      overflow: visible;
+    }
+    .chain-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow: visible;
+    }
+
+    .chain-area.drag-over {
+      background: rgba(78, 205, 196, 0.12);
+      border-color: var(--chinese);
+    }
+
+    .chain-placeholder {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    /* ── Hand area ── */
+    .hand-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .hand-area {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+      min-height: 130px;
+      padding: 1rem;
+      background: rgba(255,255,255,0.03);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* ── Domino tile ── */
+    .tile-wrapper {
+      position: relative;
+      display: inline-flex;
+      cursor: grab;
+      user-select: none;
+      transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), filter 0.18s;
+    }
+
+    .tile-wrapper:hover { transform: translateY(-6px); filter: drop-shadow(0 8px 20px rgba(78,205,196,0.35)); }
+    .tile-wrapper.dragging { opacity: 0.45; cursor: grabbing; }
+    .tile-wrapper.selected { filter: drop-shadow(0 0 14px rgba(78,205,196,0.8)); transform: translateY(-8px); }
+    .tile-wrapper.shake {
+      animation: shake 0.38s ease;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-6px); }
+      80% { transform: translateX(6px); }
+    }
+
+    .tile-svg { display: block; }
+
+    /* Tile text inside SVG handled via foreignObject */
+    .tile-char {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--text);
+      text-align: center;
+      line-height: 1;
+    }
+
+    .tile-char.label {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 1.75rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 0.6rem 1.5rem;
+      border-radius: 999px;
+      border: 2px solid;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-check {
+      background: var(--chinese);
+      border-color: var(--chinese);
+      color: var(--bg);
+    }
+
+    .btn-check:hover { box-shadow: 0 8px 24px var(--chinese-glow); }
+
+    .btn-reset {
+      background: transparent;
+      border-color: var(--text-muted);
+      color: var(--text-muted);
+    }
+
+    .btn-reset:hover { border-color: var(--text); color: var(--text); }
+
+    /* ── Result message ── */
+    .result-msg {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.4rem;
+      min-height: 2rem;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .result-msg.show { opacity: 1; }
+    .result-msg.correct { color: var(--chinese); }
+    .result-msg.wrong { color: var(--math); }
+
+    /* ── Progress info ── */
+    .progress-info {
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 0.75rem;
+    }
+
+    /* ── Footer ── */
+    footer {
+      position: relative; z-index: 1;
+      padding: 3.5rem 2rem 3rem; text-align: center;
+      color: var(--text-muted); font-size: 0.85rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      margin-top: 2rem;
+    }
+    .footer-top { display: flex; align-items: flex-start; justify-content: center; gap: 4rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+    .footer-school-logo { background: white; border-radius: 10px; padding: 8px 16px; display: inline-block; }
+    .footer-school-logo img { height: 48px; width: auto; display: block; }
+    .footer-wx-block { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
+    .footer-wx-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+    .footer-wx-qr { background: white; border-radius: 10px; padding: 8px; display: inline-block; }
+    .footer-wx-qr img { width: 96px; height: 96px; display: block; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem; }
+    footer a { color: var(--chinese); text-decoration: none; font-weight: 600; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .orb, .star { animation: none; }
+      * { transition: none !important; }
+    }
+
+    @media (max-width: 700px) {
+      .game-container { padding: 1.5rem 0.75rem 3rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="orbs" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<div id="stars" aria-hidden="true"></div>
+
+<nav>
+  <a href="../../../index.html" class="nav-logo-img">
+    <img src="../../../school-logo.jpg" alt="Academia Hua Xi Idioma Chino">
+  </a>
+  <ul class="nav-links">
+    <li><a href="../../../index.html#matematicas" class="math">Matemáticas</a></li>
+    <li><a href="../../../index.html#chino" class="chinese">Chino</a></li>
+    <li><a href="../../../index.html#miscelaneos" class="misc">Misceláneos</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="game-container">
+    <div class="game-header">
+      <h1 class="game-title">🀱 Dominó de Palabras</h1>
+      <p class="game-subtitle">Arrastra las fichas para encadenar los caracteres en el orden correcto</p>
+    </div>
+
+    <p class="chain-label">Cadena — ordena las fichas aquí</p>
+    <div class="chain-area" id="chainArea">
+      <span class="chain-placeholder" id="chainPlaceholder">Arrastra las fichas aquí ↓</span>
+    </div>
+
+    <p class="hand-label">Fichas disponibles (mezcladas)</p>
+    <div class="hand-area" id="handArea"></div>
+
+    <div class="controls">
+      <button class="btn btn-check" id="btnCheck">✓ Comprobar</button>
+      <button class="btn btn-reset" id="btnReset">↺ Reiniciar</button>
+      <a href="../../../index.html#chino" class="btn btn-reset">← Volver</a>
+    </div>
+
+    <div class="result-msg" id="resultMsg"></div>
+    <p class="progress-info" id="progressInfo"></p>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-top">
+    <div class="footer-school-logo">
+      <img src="../../../school-logo.jpg" alt="Academia Hua Xi Idioma Chino">
+    </div>
+    <div class="footer-wx-block">
+      <span class="footer-wx-label">Contáctanos en WeChat</span>
+      <div class="footer-wx-qr">
+        <img src="../../../wx-logo.png" alt="Código QR de WeChat">
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Academia Huaxi Juegos &mdash; Hecho para aprender jugando</p>
+    <p style="margin-top:0.5rem;">
+      <a href="https://github.com/aprende-contento/academia-huaxi-juegos" target="_blank" rel="noopener">Ver en GitHub</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────
+// Words: 春天 美丽 幸福 温柔 前行 快乐 希望 继续 永远 成功
+// Each tile: { left, right, isStart, isEnd }
+const CORRECT_ORDER = [
+  { id: 0,  left: '开始', right: '春',  isStart: true,  isEnd: false },
+  { id: 1,  left: '天',   right: '美',  isStart: false, isEnd: false },
+  { id: 2,  left: '丽',   right: '幸',  isStart: false, isEnd: false },
+  { id: 3,  left: '福',   right: '温',  isStart: false, isEnd: false },
+  { id: 4,  left: '柔',   right: '前',  isStart: false, isEnd: false },
+  { id: 5,  left: '行',   right: '快',  isStart: false, isEnd: false },
+  { id: 6,  left: '乐',   right: '希',  isStart: false, isEnd: false },
+  { id: 7,  left: '望',   right: '继',  isStart: false, isEnd: false },
+  { id: 8,  left: '续',   right: '永',  isStart: false, isEnd: false },
+  { id: 9,  left: '远',   right: '成',  isStart: false, isEnd: false },
+  { id: 10, left: '功',   right: '结束', isStart: false, isEnd: true  },
+];
+
+// ── State ─────────────────────────────────────────────────────────────
+let hand = [];      // tiles in hand area (shuffled)
+let chain = [];     // tiles placed in chain area
+let dragSrc = null; // { tile, fromArea: 'hand'|'chain', index }
+let selectedTile = null; // for click-to-place on mobile
+
+// ── SVG tile builder ──────────────────────────────────────────────────
+const W = 130;   // tile width
+const H = 110;   // tile height
+const TAB = 16;  // puzzle tab radius
+const NECK = 0.32; // tab neck as fraction of side height
+
+function tilePath(hasLeftTab, hasRightTab) {
+  // Tile drawn from top-left, W×H, with optional puzzle tabs on sides.
+  // Left tab: concave (notch inward). Right tab: convex (bump outward).
+  // Top and bottom are straight.
+  const r = 10; // corner radius
+  const mid = H / 2;
+  const neckH = H * NECK;
+
+  // We build the path clockwise starting from top-left corner.
+  // Left side: if hasLeftTab → notch (indented), else straight.
+  // Right side: if hasRightTab → bump (protruding), else straight.
+
+  let d = '';
+
+  if (!hasLeftTab && !hasRightTab) {
+    // Simple rounded rect
+    d = `M ${r} 0 H ${W - r} Q ${W} 0 ${W} ${r} V ${H - r} Q ${W} ${H} ${W - r} ${H} H ${r} Q 0 ${H} 0 ${H - r} V ${r} Q 0 0 ${r} 0 Z`;
+    return d;
+  }
+
+  // Top edge (left corner → right corner)
+  d += `M ${r} 0 H ${W - r} Q ${W} 0 ${W} ${r} `;
+
+  // Right side (top → bottom)
+  if (hasRightTab) {
+    // Bump: protrudes to the right
+    d += `V ${mid - neckH} `;
+    d += `C ${W} ${mid - neckH} ${W + TAB * 1.4} ${mid - TAB} ${W + TAB * 1.4} ${mid} `;
+    d += `C ${W + TAB * 1.4} ${mid + TAB} ${W} ${mid + neckH} ${W} ${mid + neckH} `;
+    d += `V ${H - r} `;
+  } else {
+    d += `V ${H - r} `;
+  }
+
+  // Bottom-right corner and bottom edge
+  d += `Q ${W} ${H} ${W - r} ${H} H ${r} Q 0 ${H} 0 ${H - r} `;
+
+  // Left side (bottom → top)
+  if (hasLeftTab) {
+    // Notch: indents inward (concave)
+    d += `V ${mid + neckH} `;
+    d += `C 0 ${mid + neckH} ${TAB * 1.4} ${mid + TAB} ${TAB * 1.4} ${mid} `;
+    d += `C ${TAB * 1.4} ${mid - TAB} 0 ${mid - neckH} 0 ${mid - neckH} `;
+    d += `V ${r} `;
+  } else {
+    d += `V ${r} `;
+  }
+
+  // Top-left corner
+  d += `Q 0 0 ${r} 0 Z`;
+
+  return d;
+}
+
+function makeTileSVG(tile) {
+  const hasLeft  = !tile.isStart;
+  const hasRight = !tile.isEnd;
+
+  // Extra width for right bump
+  const svgW = hasRight ? W + TAB * 1.4 + 2 : W;
+  const svgH = H;
+
+  const path = tilePath(hasLeft, hasRight);
+
+  // Divider line x (center of the base rect)
+  const divX = W / 2;
+
+  // Text positions — left cell shifted right when there's a notch
+  const leftCx  = hasLeft ? W * 0.37 : W * 0.26;
+  const rightCx = W * 0.74;
+  const textY   = H / 2;
+
+  const leftIsLabel  = tile.isStart;
+  const rightIsLabel = tile.isEnd;
+
+  const leftFontSize  = leftIsLabel  ? '11' : '24';
+  const rightFontSize = rightIsLabel ? '11' : '24';
+  const leftFill  = leftIsLabel  ? '#9A8EC0' : '#F0EBF8';
+  const rightFill = rightIsLabel ? '#9A8EC0' : '#F0EBF8';
+
+  return `<svg class="tile-svg" width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="clip-${tile.id}">
+      <path d="${path}"/>
+    </clipPath>
+    <linearGradient id="tileGrad-${tile.id}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#312070"/>
+      <stop offset="100%" stop-color="#261855"/>
+    </linearGradient>
+  </defs>
+  <!-- Shadow -->
+  <path d="${path}" fill="rgba(0,0,0,0.35)" transform="translate(2,3)"/>
+  <!-- Tile body -->
+  <path d="${path}" fill="url(#tileGrad-${tile.id})" stroke="rgba(78,205,196,0.4)" stroke-width="0.8"/>
+  <!-- Divider line -->
+  <line x1="${divX}" y1="10" x2="${divX}" y2="${H - 10}" stroke="rgba(78,205,196,0.75)" stroke-width="1.5"/>
+  <!-- Left text -->
+  <text x="${leftCx}" y="${textY}" text-anchor="middle" dominant-baseline="central"
+    font-family="'Baloo 2', sans-serif" font-weight="800" font-size="${leftFontSize}"
+    fill="${leftFill}">${tile.left}</text>
+  <!-- Right text -->
+  <text x="${rightCx}" y="${textY}" text-anchor="middle" dominant-baseline="central"
+    font-family="'Baloo 2', sans-serif" font-weight="800" font-size="${rightFontSize}"
+    fill="${rightFill}">${tile.right}</text>
+</svg>`;
+}
+
+// ── Render ────────────────────────────────────────────────────────────
+function render() {
+  const chainArea = document.getElementById('chainArea');
+  const handArea  = document.getElementById('handArea');
+  const placeholder = document.getElementById('chainPlaceholder');
+
+  chainArea.innerHTML = '';
+  handArea.innerHTML  = '';
+
+  // Re-add placeholder if needed
+  if (chain.length === 0) {
+    const ph = document.createElement('span');
+    ph.className = 'chain-placeholder';
+    ph.id = 'chainPlaceholder';
+    ph.textContent = 'Arrastra las fichas aquí ↓';
+    chainArea.appendChild(ph);
+  }
+
+  // 按行分组：计算每行能放几张骨牌
+  const availWidth = chainArea.clientWidth - 32; // 减去左右 padding
+  const firstTileW = W + TAB * 1.4 + 2;         // ~154px
+  const addlTileW  = W;                           // 每张额外骨牌净增宽度 130px
+  const tilesPerRow = Math.max(1, 1 + Math.floor((availWidth - firstTileW) / addlTileW));
+
+  for (let rowStart = 0; rowStart < chain.length; rowStart += tilesPerRow) {
+    const rowTiles = chain.slice(rowStart, rowStart + tilesPerRow);
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'chain-row';
+    rowTiles.forEach((tile, posInRow) => {
+      const wrapper = createTileEl(tile, 'chain', rowStart + posInRow, posInRow);
+      rowDiv.appendChild(wrapper);
+    });
+    chainArea.appendChild(rowDiv);
+  }
+
+  hand.forEach((tile, i) => {
+    const wrapper = createTileEl(tile, 'hand', i, i);
+    handArea.appendChild(wrapper);
+  });
+
+  // Progress
+  document.getElementById('progressInfo').textContent =
+    chain.length > 0
+      ? `Fichas colocadas: ${chain.length} / ${CORRECT_ORDER.length}`
+      : '';
+}
+
+function createTileEl(tile, area, index, posInRow) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'tile-wrapper';
+  wrapper.innerHTML = makeTileSVG(tile);
+  wrapper.dataset.tileId = tile.id;
+  wrapper.dataset.area   = area;
+  wrapper.dataset.index  = index;
+
+  if (selectedTile && selectedTile.tile.id === tile.id) {
+    wrapper.classList.add('selected');
+  }
+
+  // In chain: overlap within the same row so puzzle tabs interlock seamlessly
+  const pos = (posInRow !== undefined) ? posInRow : index;
+  if (area === 'chain' && pos > 0) {
+    const overlap = TAB * 1.4 + 2;
+    wrapper.style.marginLeft = `-${overlap}px`;
+    wrapper.style.zIndex = pos;
+  }
+
+  // Drag events
+  wrapper.draggable = true;
+  wrapper.addEventListener('dragstart', onDragStart);
+  wrapper.addEventListener('dragend',   onDragEnd);
+
+  // Click / tap
+  wrapper.addEventListener('click', onTileClick);
+
+  return wrapper;
+}
+
+// ── Drag & drop ───────────────────────────────────────────────────────
+const chainArea = document.getElementById('chainArea');
+const handArea  = document.getElementById('handArea');
+
+chainArea.addEventListener('dragover',  e => { e.preventDefault(); chainArea.classList.add('drag-over'); });
+chainArea.addEventListener('dragleave', () => chainArea.classList.remove('drag-over'));
+chainArea.addEventListener('drop',      onDropChain);
+
+handArea.addEventListener('dragover',  e => { e.preventDefault(); });
+handArea.addEventListener('drop',      onDropHand);
+
+function onDragStart(e) {
+  const w = e.currentTarget;
+  dragSrc = { id: +w.dataset.tileId, area: w.dataset.area, index: +w.dataset.index };
+  w.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function onDragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  chainArea.classList.remove('drag-over');
+  dragSrc = null;
+}
+
+function onDropChain(e) {
+  e.preventDefault();
+  chainArea.classList.remove('drag-over');
+  if (!dragSrc) return;
+  moveTileToChain(dragSrc.id, dragSrc.area);
+}
+
+function onDropHand(e) {
+  e.preventDefault();
+  if (!dragSrc || dragSrc.area !== 'chain') return;
+  moveTileToHand(dragSrc.id);
+}
+
+// ── Click to place ────────────────────────────────────────────────────
+function onTileClick(e) {
+  const w = e.currentTarget;
+  const area  = w.dataset.area;
+  const tileId = +w.dataset.tileId;
+
+  if (area === 'hand') {
+    if (selectedTile && selectedTile.tile.id === tileId) {
+      // Deselect
+      selectedTile = null;
+      render();
+    } else {
+      // Select and place immediately on click (mobile-friendly)
+      selectedTile = null;
+      moveTileToChain(tileId, 'hand');
+    }
+  } else {
+    // Remove from chain → back to hand
+    moveTileToHand(tileId);
+  }
+}
+
+function moveTileToChain(tileId, fromArea) {
+  if (fromArea === 'hand') {
+    const idx = hand.findIndex(t => t.id === tileId);
+    if (idx === -1) return;
+
+    // Validate: must be the correct next tile
+    const expectedId = CORRECT_ORDER[chain.length].id;
+    if (tileId !== expectedId) {
+      // Shake the tile and reject
+      const el = document.querySelector(`[data-tile-id="${tileId}"]`);
+      if (el) {
+        el.classList.remove('shake');
+        void el.offsetWidth; // reflow to restart animation
+        el.classList.add('shake');
+        el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+      }
+      return;
+    }
+
+    const [tile] = hand.splice(idx, 1);
+    chain.push(tile);
+  }
+  clearResult();
+  render();
+  // 自动检查：所有骨牌放完后立即出结果
+  if (chain.length === CORRECT_ORDER.length) {
+    setTimeout(checkResult, 150); // 等渲染完毕再显示
+  }
+}
+
+function moveTileToHand(tileId) {
+  const idx = chain.findIndex(t => t.id === tileId);
+  if (idx === -1) return;
+  const [tile] = chain.splice(idx, 1);
+  hand.push(tile);
+  clearResult();
+  render();
+}
+
+// ── Check ─────────────────────────────────────────────────────────────
+function checkResult() {
+  const correct = chain.every((tile, i) => tile.id === CORRECT_ORDER[i].id);
+  if (correct) {
+    playSuccessSound();
+    showResult('🎉 ¡Perfecto! 春天→美丽→幸福→温柔→前行→快乐→希望→继续→永远→成功', 'correct');
+    document.getElementById('btnCheck').style.display = 'none';
+    document.querySelector('.game-subtitle').style.display = 'none';
+    document.querySelector('.hand-label').style.display = 'none';
+    document.getElementById('handArea').style.display = 'none';
+  } else {
+    showResult('Algo está mal… intenta de nuevo. ¡Tú puedes!', 'wrong');
+  }
+}
+
+document.getElementById('btnCheck').addEventListener('click', () => {
+  if (chain.length !== CORRECT_ORDER.length) {
+    showResult('¡Faltan fichas! Coloca todas las fichas en la cadena.', 'wrong');
+    return;
+  }
+  checkResult();
+});
+
+// ── Sonido de éxito (Web Audio API) ───────────────────────────────────
+function playSuccessSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const notes = [523, 659, 784, 1047]; // Do Mi Sol Do (acorde mayor)
+    notes.forEach((freq, i) => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      const start = ctx.currentTime + i * 0.13;
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(0.22, start + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.5);
+      osc.start(start);
+      osc.stop(start + 0.55);
+    });
+  } catch (e) {}
+}
+
+function showResult(text, type) {
+  const msg = document.getElementById('resultMsg');
+  msg.textContent = text;
+  msg.className = `result-msg show ${type}`;
+}
+
+function clearResult() {
+  const msg = document.getElementById('resultMsg');
+  msg.className = 'result-msg';
+  msg.textContent = '';
+}
+
+// ── Reset ─────────────────────────────────────────────────────────────
+document.getElementById('btnReset').addEventListener('click', initGame);
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function initGame() {
+  hand  = shuffle([...CORRECT_ORDER]);
+  chain = [];
+  selectedTile = null;
+  clearResult();
+  render();
+}
+
+// ── Stars ─────────────────────────────────────────────────────────────
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 140; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random() * 2.5 + 0.5;
+  s.style.cssText = [
+    `left:${Math.random()*100}%`,
+    `top:${Math.random()*100}%`,
+    `width:${size}px`,
+    `height:${size}px`,
+    `--d:${2 + Math.random()*5}s`,
+    `--o:${0.3 + Math.random()*0.65}`,
+    `animation-delay:${Math.random()*7}s`
+  ].join(';');
+  starsEl.appendChild(s);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────
+initGame();
+</script>
+</body>
+</html>
