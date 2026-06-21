@@ -200,7 +200,7 @@ nav {
 
 ### Footer (required on every page)
 
-The footer always contains the school logo and the WeChat QR code side by side, then a bottom line with the tagline and GitHub link.
+The footer always contains the school logo and the WeChat QR code side by side, then a bottom line with the tagline.
 
 ```html
 <footer>
@@ -217,9 +217,6 @@ The footer always contains the school logo and the WeChat QR code side by side, 
   </div>
   <div class="footer-bottom">
     <p>Academia Huaxi Juegos &mdash; Hecho para aprender jugando</p>
-    <p style="margin-top:0.5rem;">
-      <a href="https://github.com/aprende-contento/academia-huaxi-juegos" target="_blank" rel="noopener">Ver en GitHub</a>
-    </p>
   </div>
 </footer>
 ```
@@ -334,4 +331,5 @@ New games go inside the appropriate category folder as `games/{categoria}/{slug}
 - Do not omit the starfield or ambient orbs from any page.
 - Do not omit the nav or footer from any page.
 - Do not write UI copy in English — everything is in Spanish.
+- Do not add a "Ver en GitHub" link (or any GitHub link) to the footer. Remove it if already present.
 - Do not commit or push without asking the user first.
