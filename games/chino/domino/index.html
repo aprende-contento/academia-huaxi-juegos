@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dominó de Palabras — Academia Huaxi</title>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700&family=Ma+Shan+Zheng&family=Fredoka+One&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #F4EFFF;
@@ -24,12 +24,9 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-body);
-      overflow-x: hidden;
-      line-height: 1.6;
-      min-height: 100vh;
+      background: var(--bg); color: var(--text);
+      font-family: var(--font-body); overflow-x: hidden;
+      line-height: 1.6; min-height: 100vh;
     }
     main { position: relative; z-index: 1; }
     :focus-visible { outline: 2px solid var(--misc); outline-offset: 3px; border-radius: 6px; }
@@ -45,13 +42,10 @@
     @keyframes drift { 0%, 100% { transform: translate(0,0) scale(1); } 33% { transform: translate(40px,-30px) scale(1.06); } 66% { transform: translate(-25px,35px) scale(0.94); } }
 
     nav {
-      position: sticky; top: 0; z-index: 100;
-      padding: 0 2rem;
-      background: rgba(220, 210, 245, 0.95);
-      backdrop-filter: blur(14px);
+      position: sticky; top: 0; z-index: 100; padding: 0 2rem;
+      background: rgba(220, 210, 245, 0.95); backdrop-filter: blur(14px);
       border-bottom: 1px solid rgba(107, 91, 149, 0.15);
-      display: flex; align-items: center; justify-content: space-between;
-      height: 64px;
+      display: flex; align-items: center; justify-content: space-between; height: 64px;
     }
     .nav-logo-img { border-radius: 8px; padding: 4px 10px; display: flex; align-items: center; text-decoration: none; transition: opacity 0.2s; }
     .nav-logo-img:hover { opacity: 0.85; }
@@ -64,215 +58,208 @@
     .nav-links a.misc:hover { color: var(--misc); }
     @media (max-width: 640px) { nav { padding: 0 1rem; } .nav-links { display: none; } }
 
-    /* ── Game layout ── */
+    /* ── Screens ── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── Setup screen ── */
+    .setup-container {
+      max-width: 555px; margin: 0 auto;
+      padding: 4rem 1.5rem 5rem;
+      text-align: center;
+    }
+    .setup-title {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      color: var(--chinese); margin-bottom: 0.5rem;
+    }
+    .setup-subtitle {
+      color: var(--text-muted); font-size: 0.95rem;
+      margin-bottom: 2.5rem; line-height: 1.6;
+    }
+    .setup-card {
+      background: var(--surface); border-radius: 20px;
+      padding: 2rem; box-shadow: 0 8px 32px rgba(26,15,60,0.08);
+      border: 1px solid rgba(107, 91, 149, 0.12);
+      text-align: left;
+    }
+    .setup-card label {
+      display: block; font-weight: 700; font-size: 0.8rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 0.75rem;
+    }
+    .word-input {
+      width: 100%; min-height: 100px;
+      background: rgba(107, 91, 149, 0.05);
+      border: 2px solid rgba(107, 91, 149, 0.18);
+      border-radius: 12px; padding: 0.85rem 1rem;
+      font-family: var(--font-display); font-weight: 600;
+      font-size: 1.3rem; color: var(--text);
+      resize: vertical; outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      line-height: 1.8; letter-spacing: 0.05em;
+    }
+    .word-input::placeholder { color: var(--text-muted); opacity: 0.5; font-size: 1rem; }
+    .word-input:focus { border-color: var(--chinese); background: rgba(30, 154, 146, 0.04); }
+    .setup-hint {
+      font-size: 0.78rem; color: var(--text-muted);
+      margin-top: 0.6rem; line-height: 1.5;
+    }
+    .word-preview { display: none; }
+    .word-chip {
+      background: rgba(30, 154, 146, 0.1); color: var(--chinese);
+      border: 1px solid rgba(30, 154, 146, 0.25);
+      border-radius: 999px; padding: 0.2rem 0.7rem;
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 1rem;
+    }
+    .word-chip.error {
+      background: rgba(217, 79, 48, 0.1); color: var(--math);
+      border-color: rgba(217, 79, 48, 0.3);
+    }
+    .setup-error {
+      margin-top: 1rem; padding: 0.65rem 1rem;
+      background: rgba(217, 79, 48, 0.08);
+      border: 1px solid rgba(217, 79, 48, 0.2);
+      border-radius: 10px; color: var(--math);
+      font-size: 0.85rem; font-weight: 600;
+      display: none;
+    }
+    .setup-error.show { display: block; }
+    .btn-start {
+      width: 100%; margin-top: 1.5rem;
+      background: var(--chinese); color: white;
+      border: none; border-radius: 12px;
+      font-family: var(--font-display); font-weight: 800;
+      font-size: 1.1rem; padding: 0.85rem 1.5rem;
+      cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-start:hover { transform: translateY(-2px); box-shadow: 0 8px 24px var(--chinese-glow); }
+    .btn-start:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* ── Game screen ── */
     .game-container {
-      max-width: 1100px;
-      margin: 0 auto;
+      max-width: 900px; margin: 0 auto;
       padding: 2.5rem 1.5rem 4rem;
     }
-
-    .game-header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
+    .game-header { text-align: center; margin-bottom: 2rem; }
     .game-title {
-      font-family: var(--font-display);
-      font-weight: 800;
+      font-family: var(--font-display); font-weight: 800;
       font-size: clamp(1.8rem, 4vw, 2.6rem);
-      color: var(--chinese);
-      margin-bottom: 0.4rem;
+      color: var(--chinese); margin-bottom: 0.4rem;
     }
-
-    .game-subtitle {
-      color: var(--text-muted);
-      font-size: 0.95rem;
+    .game-subtitle { color: var(--text-muted); font-size: 0.95rem; }
+    .word-list-display {
+      display: flex; flex-wrap: wrap; gap: 0.35rem;
+      justify-content: center; margin-top: 0.75rem;
     }
+    .word-list-display .word-chip { font-size: 0.9rem; }
 
     /* ── Chain area ── */
     .chain-label {
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 0.75rem;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.75rem;
     }
-
     .chain-area {
       background: rgba(30, 154, 146, 0.04);
       border: 2px dashed rgba(30, 154, 146, 0.3);
-      border-radius: 16px;
-      min-height: 140px;
+      border-radius: 16px; min-height: 140px;
       padding: 1.25rem 1rem;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.5rem;
+      display: flex; flex-direction: column;
+      align-items: flex-start; gap: 0.5rem;
       margin-bottom: 2rem;
       transition: background 0.2s, border-color 0.2s;
-      position: relative;
-      overflow: visible;
+      position: relative; overflow: visible;
     }
-    .chain-row {
-      display: flex;
-      align-items: center;
-      gap: 0;
-      overflow: visible;
-    }
-
-    .chain-area.drag-over {
-      background: rgba(30, 154, 146, 0.08);
-      border-color: var(--chinese);
-    }
-
+    .chain-row { display: flex; align-items: center; gap: 0; overflow: visible; }
+    .chain-area.drag-over { background: rgba(30, 154, 146, 0.08); border-color: var(--chinese); }
     .chain-placeholder {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      position: absolute;
-      top: 50%; left: 50%;
+      color: var(--text-muted); font-size: 0.9rem;
+      position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      pointer-events: none;
-      white-space: nowrap;
+      pointer-events: none; white-space: nowrap;
     }
 
     /* ── Hand area ── */
     .hand-label {
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 0.75rem;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.75rem;
     }
-
     .hand-area {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      justify-content: center;
-      min-height: 130px;
-      padding: 1rem;
+      display: flex; flex-wrap: wrap; gap: 0.75rem;
+      justify-content: center; min-height: 130px; padding: 1rem;
       background: rgba(107, 91, 149, 0.05);
-      border-radius: 16px;
-      border: 1px solid rgba(107, 91, 149, 0.12);
+      border-radius: 16px; border: 1px solid rgba(107, 91, 149, 0.12);
     }
 
-    /* ── Domino tile ── */
+    /* ── Tile ── */
     .tile-wrapper {
-      position: relative;
-      display: inline-flex;
-      cursor: grab;
-      user-select: none;
+      position: relative; display: inline-flex;
+      cursor: grab; user-select: none;
       transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), filter 0.18s;
     }
-
     .tile-wrapper:hover { transform: translateY(-6px); filter: drop-shadow(0 8px 20px rgba(30,154,146,0.25)); }
     .tile-wrapper.dragging { opacity: 0.45; cursor: grabbing; }
     .tile-wrapper.selected { filter: drop-shadow(0 0 14px rgba(30,154,146,0.5)); transform: translateY(-8px); }
-    .tile-wrapper.shake {
-      animation: shake 0.38s ease;
-    }
+    .tile-wrapper.shake { animation: shake 0.38s ease; }
     @keyframes shake {
       0%,100% { transform: translateX(0); }
-      20% { transform: translateX(-8px); }
-      40% { transform: translateX(8px); }
-      60% { transform: translateX(-6px); }
-      80% { transform: translateX(6px); }
+      20% { transform: translateX(-8px); } 40% { transform: translateX(8px); }
+      60% { transform: translateX(-6px); } 80% { transform: translateX(6px); }
     }
-
     .tile-svg { display: block; }
-
-    /* Tile text inside SVG handled via foreignObject */
-    .tile-char {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 1.5rem;
-      color: var(--text);
-      text-align: center;
-      line-height: 1;
-    }
-
-    .tile-char.label {
-      font-family: var(--font-body);
-      font-weight: 700;
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      letter-spacing: 0.05em;
-    }
 
     /* ── Controls ── */
     .controls {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      margin-top: 1.75rem;
-      flex-wrap: wrap;
+      display: flex; gap: 1rem; justify-content: center;
+      margin-top: 1.75rem; flex-wrap: wrap;
     }
-
     .btn {
-      font-family: var(--font-body);
-      font-weight: 700;
-      font-size: 0.9rem;
-      padding: 0.6rem 1.5rem;
-      border-radius: 999px;
-      border: 2px solid;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      text-decoration: none;
+      font-family: var(--font-body); font-weight: 700; font-size: 0.9rem;
+      padding: 0.6rem 1.5rem; border-radius: 999px; border: 2px solid;
+      cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none; display: inline-flex; align-items: center;
     }
-
     .btn:hover { transform: translateY(-2px); }
-
-    .btn-check {
-      background: var(--chinese);
-      border-color: var(--chinese);
-      color: var(--bg);
-    }
-
+    .btn-check { background: var(--chinese); border-color: var(--chinese); color: white; }
     .btn-check:hover { box-shadow: 0 8px 24px var(--chinese-glow); }
+    .btn-secondary { background: transparent; border-color: var(--text-muted); color: var(--text-muted); }
+    .btn-secondary:hover { border-color: var(--text); color: var(--text); }
 
-    .btn-reset {
-      background: transparent;
-      border-color: var(--text-muted);
-      color: var(--text-muted);
-    }
-
-    .btn-reset:hover { border-color: var(--text); color: var(--text); }
-
-    /* ── Result message ── */
+    /* ── Result ── */
     .result-msg {
-      text-align: center;
-      margin-top: 1.5rem;
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 1.4rem;
-      min-height: 2rem;
-      opacity: 0;
-      transition: opacity 0.4s;
+      text-align: center; margin-top: 1.5rem;
+      font-family: var(--font-display); font-weight: 800; font-size: 1.4rem;
+      min-height: 2rem; opacity: 0; transition: opacity 0.4s;
     }
-
     .result-msg.show { opacity: 1; }
     .result-msg.correct { color: var(--chinese); }
     .result-msg.wrong { color: var(--math); }
+    .progress-info { text-align: center; font-size: 0.82rem; color: var(--text-muted); margin-top: 0.75rem; }
 
-    /* ── Progress info ── */
-    .progress-info {
-      text-align: center;
-      font-size: 0.82rem;
-      color: var(--text-muted);
+    /* ── Timer ── */
+    .timer-display {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--surface); border: 2px solid rgba(30, 154, 146, 0.25);
+      border-radius: 999px; padding: 0.3rem 1.1rem;
+      font-family: 'Fredoka One', cursive; font-size: 1.5rem;
+      color: var(--chinese); letter-spacing: 0.06em;
       margin-top: 0.75rem;
     }
+    .timer-display.done { color: var(--misc); border-color: rgba(184,144,10,0.35); }
 
     /* ── Footer ── */
     footer {
       position: relative; z-index: 1;
       padding: 3.5rem 2rem 3rem; text-align: center;
       color: var(--text-muted); font-size: 0.85rem;
-      border-top: 1px solid rgba(107, 91, 149, 0.12);
-      margin-top: 2rem;
+      border-top: 1px solid rgba(107, 91, 149, 0.12); margin-top: 2rem;
     }
     .footer-top { display: flex; align-items: center; justify-content: center; gap: 6rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+    .footer-logo-block { display: flex; flex-direction: column; align-items: flex-start; gap: 2rem; min-width: 320px; }
+    .footer-wa-link { display: flex; flex-direction: row; align-items: center; gap: 0.75rem; text-decoration: none; transition: opacity 0.2s; margin-top: 1.2rem; }
+    .footer-wa-link:hover { opacity: 0.75; }
+    .footer-wa-number { font-size: 2.19rem; font-weight: 900; color: #25D366; letter-spacing: 0.04em; line-height: 1; }
     .footer-school-logo { display: inline-block; }
     .footer-school-logo img { height: 68px; width: auto; display: block; }
     .footer-wx-block { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
@@ -283,26 +270,8 @@
     footer a { color: var(--chinese); text-decoration: none; font-weight: 600; }
     footer a:hover { text-decoration: underline; }
 
-    @media (prefers-reduced-motion: reduce) {
-      .orb, .star { animation: none; }
-      * { transition: none !important; }
-    }
-
-    @media (max-width: 700px) {
-      .game-container { padding: 1.5rem 0.75rem 3rem; }
-    }
-
-    .footer-logo-block { display: flex; flex-direction: column; align-items: flex-start; gap: 2rem; min-width: 320px; }
-    .footer-wa-link {
-      display: flex; flex-direction: row; align-items: center; gap: 0.75rem;
-      text-decoration: none; transition: opacity 0.2s;
-      margin-top: 1.2rem;
-    }
-    .footer-wa-link:hover { opacity: 0.75; }
-    .footer-wa-number {
-      font-size: 2.19rem; font-weight: 900; color: #25D366;
-      letter-spacing: 0.04em; line-height: 1;
-    }
+    @media (prefers-reduced-motion: reduce) { .orb, .star { animation: none; } * { transition: none !important; } }
+    @media (max-width: 700px) { .game-container, .setup-container { padding: 1.5rem 0.75rem 3rem; } }
   </style>
 </head>
 <body>
@@ -326,29 +295,63 @@
 </nav>
 
 <main>
-  <div class="game-container">
-    <div class="game-header">
-      <h1 class="game-title">🔗 Dominó de Palabras</h1>
-      <p class="game-subtitle">Arrastra las fichas para encadenar los caracteres en el orden correcto</p>
+
+  <!-- ── 选词屏 ── -->
+  <div class="screen active" id="screenSetup">
+    <div class="setup-container">
+      <h1 class="setup-title">🔗 Dominó de Palabras</h1>
+      <p class="setup-subtitle">Introduce las palabras de dos caracteres para generar el dominó</p>
+
+      <div class="setup-card">
+        <label for="wordInput">词语（每个两个字）</label>
+        <textarea
+          class="word-input"
+          id="wordInput"
+          placeholder="春天 美丽 幸福 温柔 前行&#10;可以用空格或逗号分隔"
+          rows="4"
+        ></textarea>
+        <p class="setup-hint">
+          每个词必须是<strong>两个汉字</strong>，词语之间用空格或逗号分隔。<br>
+          最少 2 个词，最多 20 个词。
+        </p>
+
+        <div class="word-preview" id="wordPreview"></div>
+        <div class="setup-error" id="setupError"></div>
+
+        <button class="btn-start" id="btnStart" disabled>开始游戏 →</button>
+      </div>
     </div>
-
-    <p class="chain-label">Cadena — ordena las fichas aquí</p>
-    <div class="chain-area" id="chainArea">
-      <span class="chain-placeholder" id="chainPlaceholder">Arrastra las fichas aquí ↓</span>
-    </div>
-
-    <p class="hand-label">Fichas disponibles (mezcladas)</p>
-    <div class="hand-area" id="handArea"></div>
-
-    <div class="controls">
-      <button class="btn btn-check" id="btnCheck">✓ Comprobar</button>
-      <button class="btn btn-reset" id="btnReset">↺ Reiniciar</button>
-      <a href="../../../index.html#chino" class="btn btn-reset">← Volver</a>
-    </div>
-
-    <div class="result-msg" id="resultMsg"></div>
-    <p class="progress-info" id="progressInfo"></p>
   </div>
+
+  <!-- ── 游戏屏 ── -->
+  <div class="screen" id="screenGame">
+    <div class="game-container">
+      <div class="game-header">
+        <h1 class="game-title">🔗 Dominó de Palabras</h1>
+        <p class="game-subtitle" id="gameSubtitle">Arrastra las fichas para encadenar los caracteres en el orden correcto</p>
+        <div class="word-list-display" id="wordListDisplay"></div>
+        <div class="timer-display" id="timerDisplay">⏱ 00:00</div>
+      </div>
+
+      <p class="chain-label">链条 — 在这里排列骨牌</p>
+      <div class="chain-area" id="chainArea">
+        <span class="chain-placeholder" id="chainPlaceholder">点击骨牌放置 ↓</span>
+      </div>
+
+      <p class="hand-label" id="handLabel">骨牌（已打乱）</p>
+      <div class="hand-area" id="handArea"></div>
+
+      <div class="controls">
+        <button class="btn btn-check" id="btnCheck">✓ 检查</button>
+        <button class="btn btn-secondary" id="btnReset">↺ 重新开始</button>
+        <button class="btn btn-secondary" id="btnChangeWords">✎ 换词组</button>
+      </div>
+
+      <div class="result-msg" id="resultMsg"></div>
+      <p class="progress-info" id="progressInfo"></p>
+    </div>
+  </div>
+
 </main>
 
 <footer>
@@ -377,139 +380,152 @@
 </footer>
 
 <script>
-// ── Data ──────────────────────────────────────────────────────────────
-// Words: 春天 美丽 幸福 温柔 前行 快乐 希望 继续 永远 成功
-// Each tile: { left, right, isStart, isEnd }
-const CORRECT_ORDER = [
-  { id: 0,  left: '开始', right: '春',  isStart: true,  isEnd: false },
-  { id: 1,  left: '天',   right: '美',  isStart: false, isEnd: false },
-  { id: 2,  left: '丽',   right: '幸',  isStart: false, isEnd: false },
-  { id: 3,  left: '福',   right: '温',  isStart: false, isEnd: false },
-  { id: 4,  left: '柔',   right: '前',  isStart: false, isEnd: false },
-  { id: 5,  left: '行',   right: '快',  isStart: false, isEnd: false },
-  { id: 6,  left: '乐',   right: '希',  isStart: false, isEnd: false },
-  { id: 7,  left: '望',   right: '继',  isStart: false, isEnd: false },
-  { id: 8,  left: '续',   right: '永',  isStart: false, isEnd: false },
-  { id: 9,  left: '远',   right: '成',  isStart: false, isEnd: false },
-  { id: 10, left: '功',   right: '结束', isStart: false, isEnd: true  },
-];
+// ── SVG tile constants ────────────────────────────────────────────────
+const W = 112, H = 88, TAB = 16, NECK = 0.32;
 
 // ── State ─────────────────────────────────────────────────────────────
-let hand = [];      // tiles in hand area (shuffled)
-let chain = [];     // tiles placed in chain area
-let dragSrc = null; // { tile, fromArea: 'hand'|'chain', index }
-let selectedTile = null; // for click-to-place on mobile
+let CORRECT_ORDER = [];
+let hand = [], chain = [], dragSrc = null;
+
+// ── Word parsing ──────────────────────────────────────────────────────
+function parseWords(raw) {
+  return raw
+    .replace(/[，、；,;]/g, ' ')
+    .split(/\s+/)
+    .map(w => w.trim())
+    .filter(w => w.length > 0);
+}
+
+function buildTiles(words) {
+  // N words → N+1 tiles
+  const tiles = [];
+  tiles.push({ id: 0, left: 'GO!', right: words[0][0], isStart: true, isEnd: false });
+  for (let i = 0; i < words.length - 1; i++) {
+    tiles.push({ id: i + 1, left: words[i][1], right: words[i + 1][0], isStart: false, isEnd: false });
+  }
+  tiles.push({ id: words.length, left: words[words.length - 1][1], right: 'END', isStart: false, isEnd: true });
+  return tiles;
+}
+
+// ── Setup screen ──────────────────────────────────────────────────────
+const wordInput   = document.getElementById('wordInput');
+const wordPreview = document.getElementById('wordPreview');
+const setupError  = document.getElementById('setupError');
+const btnStart    = document.getElementById('btnStart');
+
+wordInput.addEventListener('input', validateInput);
+
+function validateInput() {
+  let words = parseWords(wordInput.value);
+  setupError.classList.remove('show');
+
+  // Auto-truncate to 20 words
+  if (words.length > 20) {
+    words = words.slice(0, 20);
+    // Rebuild textarea value to only contain first 20 words
+    const sep = wordInput.value.includes(',') || wordInput.value.includes('，') ? ' ' : ' ';
+    wordInput.value = words.join(' ');
+  }
+
+  if (words.length === 0) {
+    btnStart.disabled = true;
+    return;
+  }
+
+  const hasError = words.some(w => [...w].length !== 2);
+
+  if (hasError) {
+    setupError.textContent = '⚠ 每个词必须恰好是两个汉字，请检查输入。';
+    setupError.classList.add('show');
+    btnStart.disabled = true;
+    return;
+  }
+
+  if (words.length < 2) {
+    setupError.textContent = '⚠ 请至少输入 2 个词语。';
+    setupError.classList.add('show');
+    btnStart.disabled = true;
+    return;
+  }
+
+  btnStart.disabled = false;
+}
+
+btnStart.addEventListener('click', () => {
+  const words = parseWords(wordInput.value).filter(w => [...w].length === 2);
+  CORRECT_ORDER = buildTiles(words);
+
+  // Update word display in game header
+  const display = document.getElementById('wordListDisplay');
+  display.innerHTML = words.map(w => `<span class="word-chip">${w}</span>`).join('');
+
+  showScreen('game');
+  initGame();
+});
+
+// ── Screen switching ──────────────────────────────────────────────────
+function showScreen(name) {
+  document.getElementById('screenSetup').classList.toggle('active', name === 'setup');
+  document.getElementById('screenGame').classList.toggle('active', name === 'game');
+}
+
+document.getElementById('btnChangeWords').addEventListener('click', () => {
+  showScreen('setup');
+});
 
 // ── SVG tile builder ──────────────────────────────────────────────────
-const W = 130;   // tile width
-const H = 110;   // tile height
-const TAB = 16;  // puzzle tab radius
-const NECK = 0.32; // tab neck as fraction of side height
-
 function tilePath(hasLeftTab, hasRightTab) {
-  // Tile drawn from top-left, W×H, with optional puzzle tabs on sides.
-  // Left tab: concave (notch inward). Right tab: convex (bump outward).
-  // Top and bottom are straight.
-  const r = 10; // corner radius
-  const mid = H / 2;
-  const neckH = H * NECK;
-
-  // We build the path clockwise starting from top-left corner.
-  // Left side: if hasLeftTab → notch (indented), else straight.
-  // Right side: if hasRightTab → bump (protruding), else straight.
-
+  const r = 10, mid = H / 2, neckH = H * NECK;
   let d = '';
-
   if (!hasLeftTab && !hasRightTab) {
-    // Simple rounded rect
-    d = `M ${r} 0 H ${W - r} Q ${W} 0 ${W} ${r} V ${H - r} Q ${W} ${H} ${W - r} ${H} H ${r} Q 0 ${H} 0 ${H - r} V ${r} Q 0 0 ${r} 0 Z`;
-    return d;
+    return `M ${r} 0 H ${W-r} Q ${W} 0 ${W} ${r} V ${H-r} Q ${W} ${H} ${W-r} ${H} H ${r} Q 0 ${H} 0 ${H-r} V ${r} Q 0 0 ${r} 0 Z`;
   }
-
-  // Top edge (left corner → right corner)
-  d += `M ${r} 0 H ${W - r} Q ${W} 0 ${W} ${r} `;
-
-  // Right side (top → bottom)
+  d += `M ${r} 0 H ${W-r} Q ${W} 0 ${W} ${r} `;
   if (hasRightTab) {
-    // Bump: protrudes to the right
-    d += `V ${mid - neckH} `;
-    d += `C ${W} ${mid - neckH} ${W + TAB * 1.4} ${mid - TAB} ${W + TAB * 1.4} ${mid} `;
-    d += `C ${W + TAB * 1.4} ${mid + TAB} ${W} ${mid + neckH} ${W} ${mid + neckH} `;
-    d += `V ${H - r} `;
+    d += `V ${mid-neckH} C ${W} ${mid-neckH} ${W+TAB*1.4} ${mid-TAB} ${W+TAB*1.4} ${mid} C ${W+TAB*1.4} ${mid+TAB} ${W} ${mid+neckH} ${W} ${mid+neckH} V ${H-r} `;
   } else {
-    d += `V ${H - r} `;
+    d += `V ${H-r} `;
   }
-
-  // Bottom-right corner and bottom edge
-  d += `Q ${W} ${H} ${W - r} ${H} H ${r} Q 0 ${H} 0 ${H - r} `;
-
-  // Left side (bottom → top)
+  d += `Q ${W} ${H} ${W-r} ${H} H ${r} Q 0 ${H} 0 ${H-r} `;
   if (hasLeftTab) {
-    // Notch: indents inward (concave)
-    d += `V ${mid + neckH} `;
-    d += `C 0 ${mid + neckH} ${TAB * 1.4} ${mid + TAB} ${TAB * 1.4} ${mid} `;
-    d += `C ${TAB * 1.4} ${mid - TAB} 0 ${mid - neckH} 0 ${mid - neckH} `;
-    d += `V ${r} `;
+    d += `V ${mid+neckH} C 0 ${mid+neckH} ${TAB*1.4} ${mid+TAB} ${TAB*1.4} ${mid} C ${TAB*1.4} ${mid-TAB} 0 ${mid-neckH} 0 ${mid-neckH} V ${r} `;
   } else {
     d += `V ${r} `;
   }
-
-  // Top-left corner
   d += `Q 0 0 ${r} 0 Z`;
-
   return d;
 }
 
 function makeTileSVG(tile) {
   const hasLeft  = !tile.isStart;
   const hasRight = !tile.isEnd;
-
-  // Extra width for right bump
   const svgW = hasRight ? W + TAB * 1.4 + 2 : W;
-  const svgH = H;
-
   const path = tilePath(hasLeft, hasRight);
-
-  // Divider line x (center of the base rect)
-  const divX = W / 2;
-
-  // Text positions — left cell shifted right when there's a notch
-  const leftCx  = hasLeft ? W * 0.37 : W * 0.26;
-  const rightCx = W * 0.74;
+  const divX = Math.round(W * 0.58);
+  const leftCx  = hasLeft ? W * 0.34 : W * 0.26;
+  const rightCx = tile.isEnd ? W * 0.82 : W * 0.94;
   const textY   = H / 2;
+  const leftFontSize  = tile.isStart ? '16' : '24';
+  const rightFontSize = tile.isEnd   ? '16' : '24';
+  const leftFill  = tile.isStart ? '#1E9A92' : '#1A0F3C';
+  const rightFill = tile.isEnd   ? '#1E9A92' : '#1A0F3C';
+  const leftFont  = tile.isStart ? "'Fredoka One',cursive" : "'Ma Shan Zheng','KaiTi',serif";
+  const rightFont = tile.isEnd   ? "'Fredoka One',cursive" : "'Ma Shan Zheng','KaiTi',serif";
 
-  const leftIsLabel  = tile.isStart;
-  const rightIsLabel = tile.isEnd;
-
-  const leftFontSize  = leftIsLabel  ? '11' : '24';
-  const rightFontSize = rightIsLabel ? '11' : '24';
-  const leftFill  = leftIsLabel  ? '#6B5B95' : '#1A0F3C';
-  const rightFill = rightIsLabel ? '#6B5B95' : '#1A0F3C';
-
-  return `<svg class="tile-svg" width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">
+  return `<svg class="tile-svg" width="${svgW}" height="${H}" viewBox="0 0 ${svgW} ${H}" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <clipPath id="clip-${tile.id}">
-      <path d="${path}"/>
-    </clipPath>
-    <linearGradient id="tileGrad-${tile.id}" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="tg${tile.id}" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#EDE8FF"/>
       <stop offset="100%" stop-color="#F4EFFF"/>
     </linearGradient>
   </defs>
-  <!-- Shadow -->
   <path d="${path}" fill="rgba(26,15,60,0.12)" transform="translate(2,3)"/>
-  <!-- Tile body -->
-  <path d="${path}" fill="url(#tileGrad-${tile.id})" stroke="rgba(30,154,146,0.4)" stroke-width="0.8"/>
-  <!-- Divider line -->
-  <line x1="${divX}" y1="10" x2="${divX}" y2="${H - 10}" stroke="rgba(30,154,146,0.7)" stroke-width="1.5"/>
-  <!-- Left text -->
+  <path d="${path}" fill="url(#tg${tile.id})" stroke="rgba(30,154,146,0.4)" stroke-width="0.8"/>
+  <line x1="${divX}" y1="8" x2="${divX}" y2="${H-8}" stroke="rgba(30,154,146,0.7)" stroke-width="1.5"/>
   <text x="${leftCx}" y="${textY}" text-anchor="middle" dominant-baseline="central"
-    font-family="'Baloo 2', sans-serif" font-weight="800" font-size="${leftFontSize}"
-    fill="${leftFill}">${tile.left}</text>
-  <!-- Right text -->
+    font-family="${leftFont}" font-weight="400" font-size="${leftFontSize}" fill="${leftFill}">${tile.left}</text>
   <text x="${rightCx}" y="${textY}" text-anchor="middle" dominant-baseline="central"
-    font-family="'Baloo 2', sans-serif" font-weight="800" font-size="${rightFontSize}"
-    fill="${rightFill}">${tile.right}</text>
+    font-family="${rightFont}" font-weight="400" font-size="${rightFontSize}" fill="${rightFill}">${tile.right}</text>
 </svg>`;
 }
 
@@ -517,47 +533,31 @@ function makeTileSVG(tile) {
 function render() {
   const chainArea = document.getElementById('chainArea');
   const handArea  = document.getElementById('handArea');
-  const placeholder = document.getElementById('chainPlaceholder');
-
   chainArea.innerHTML = '';
   handArea.innerHTML  = '';
 
-  // Re-add placeholder if needed
   if (chain.length === 0) {
     const ph = document.createElement('span');
     ph.className = 'chain-placeholder';
-    ph.id = 'chainPlaceholder';
-    ph.textContent = 'Arrastra las fichas aquí ↓';
+    ph.textContent = '点击骨牌放置 ↓';
     chainArea.appendChild(ph);
   }
 
-  // 按行分组：计算每行能放几张骨牌
-  const availWidth = chainArea.clientWidth - 32; // 减去左右 padding
-  const firstTileW = W + TAB * 1.4 + 2;         // ~154px
-  const addlTileW  = W;                           // 每张额外骨牌净增宽度 130px
-  const tilesPerRow = Math.max(1, 1 + Math.floor((availWidth - firstTileW) / addlTileW));
+  const tilesPerRow = 7;
 
   for (let rowStart = 0; rowStart < chain.length; rowStart += tilesPerRow) {
-    const rowTiles = chain.slice(rowStart, rowStart + tilesPerRow);
     const rowDiv = document.createElement('div');
     rowDiv.className = 'chain-row';
-    rowTiles.forEach((tile, posInRow) => {
-      const wrapper = createTileEl(tile, 'chain', rowStart + posInRow, posInRow);
-      rowDiv.appendChild(wrapper);
+    chain.slice(rowStart, rowStart + tilesPerRow).forEach((tile, posInRow) => {
+      rowDiv.appendChild(createTileEl(tile, 'chain', rowStart + posInRow, posInRow));
     });
     chainArea.appendChild(rowDiv);
   }
 
-  hand.forEach((tile, i) => {
-    const wrapper = createTileEl(tile, 'hand', i, i);
-    handArea.appendChild(wrapper);
-  });
+  hand.forEach((tile, i) => handArea.appendChild(createTileEl(tile, 'hand', i, i)));
 
-  // Progress
   document.getElementById('progressInfo').textContent =
-    chain.length > 0
-      ? `Fichas colocadas: ${chain.length} / ${CORRECT_ORDER.length}`
-      : '';
+    chain.length > 0 ? `已放置：${chain.length} / ${CORRECT_ORDER.length}` : '';
 }
 
 function createTileEl(tile, area, index, posInRow) {
@@ -568,186 +568,178 @@ function createTileEl(tile, area, index, posInRow) {
   wrapper.dataset.area   = area;
   wrapper.dataset.index  = index;
 
-  if (selectedTile && selectedTile.tile.id === tile.id) {
-    wrapper.classList.add('selected');
-  }
-
-  // In chain: overlap within the same row so puzzle tabs interlock seamlessly
-  const pos = (posInRow !== undefined) ? posInRow : index;
+  const pos = posInRow !== undefined ? posInRow : index;
   if (area === 'chain' && pos > 0) {
-    const overlap = TAB * 1.4 + 2;
-    wrapper.style.marginLeft = `-${overlap}px`;
+    wrapper.style.marginLeft = `-${TAB * 1.4 + 2}px`;
     wrapper.style.zIndex = pos;
   }
 
-  // Drag events
   wrapper.draggable = true;
   wrapper.addEventListener('dragstart', onDragStart);
   wrapper.addEventListener('dragend',   onDragEnd);
-
-  // Click / tap
-  wrapper.addEventListener('click', onTileClick);
-
+  wrapper.addEventListener('click',     onTileClick);
   return wrapper;
 }
 
 // ── Drag & drop ───────────────────────────────────────────────────────
-const chainArea = document.getElementById('chainArea');
-const handArea  = document.getElementById('handArea');
+const chainAreaEl = document.getElementById('chainArea');
+const handAreaEl  = document.getElementById('handArea');
 
-chainArea.addEventListener('dragover',  e => { e.preventDefault(); chainArea.classList.add('drag-over'); });
-chainArea.addEventListener('dragleave', () => chainArea.classList.remove('drag-over'));
-chainArea.addEventListener('drop',      onDropChain);
-
-handArea.addEventListener('dragover',  e => { e.preventDefault(); });
-handArea.addEventListener('drop',      onDropHand);
+chainAreaEl.addEventListener('dragover',  e => { e.preventDefault(); chainAreaEl.classList.add('drag-over'); });
+chainAreaEl.addEventListener('dragleave', () => chainAreaEl.classList.remove('drag-over'));
+chainAreaEl.addEventListener('drop', e => {
+  e.preventDefault(); chainAreaEl.classList.remove('drag-over');
+  if (dragSrc) moveTileToChain(dragSrc.id, dragSrc.area);
+});
+handAreaEl.addEventListener('dragover', e => e.preventDefault());
+handAreaEl.addEventListener('drop', e => {
+  e.preventDefault();
+  if (dragSrc && dragSrc.area === 'chain') moveTileToHand(dragSrc.id);
+});
 
 function onDragStart(e) {
   const w = e.currentTarget;
-  dragSrc = { id: +w.dataset.tileId, area: w.dataset.area, index: +w.dataset.index };
+  dragSrc = { id: +w.dataset.tileId, area: w.dataset.area };
   w.classList.add('dragging');
   e.dataTransfer.effectAllowed = 'move';
 }
-
 function onDragEnd(e) {
   e.currentTarget.classList.remove('dragging');
-  chainArea.classList.remove('drag-over');
+  chainAreaEl.classList.remove('drag-over');
   dragSrc = null;
-}
-
-function onDropChain(e) {
-  e.preventDefault();
-  chainArea.classList.remove('drag-over');
-  if (!dragSrc) return;
-  moveTileToChain(dragSrc.id, dragSrc.area);
-}
-
-function onDropHand(e) {
-  e.preventDefault();
-  if (!dragSrc || dragSrc.area !== 'chain') return;
-  moveTileToHand(dragSrc.id);
 }
 
 // ── Click to place ────────────────────────────────────────────────────
 function onTileClick(e) {
   const w = e.currentTarget;
-  const area  = w.dataset.area;
-  const tileId = +w.dataset.tileId;
-
-  if (area === 'hand') {
-    if (selectedTile && selectedTile.tile.id === tileId) {
-      // Deselect
-      selectedTile = null;
-      render();
-    } else {
-      // Select and place immediately on click (mobile-friendly)
-      selectedTile = null;
-      moveTileToChain(tileId, 'hand');
-    }
+  if (w.dataset.area === 'hand') {
+    moveTileToChain(+w.dataset.tileId, 'hand');
   } else {
-    // Remove from chain → back to hand
-    moveTileToHand(tileId);
+    moveTileToHand(+w.dataset.tileId);
   }
 }
 
 function moveTileToChain(tileId, fromArea) {
-  if (fromArea === 'hand') {
-    const idx = hand.findIndex(t => t.id === tileId);
-    if (idx === -1) return;
+  if (fromArea !== 'hand') return;
+  const idx = hand.findIndex(t => t.id === tileId);
+  if (idx === -1) return;
 
-    // Validate: must be the correct next tile
-    const expectedId = CORRECT_ORDER[chain.length].id;
-    if (tileId !== expectedId) {
-      // Shake the tile and reject
-      const el = document.querySelector(`[data-tile-id="${tileId}"]`);
-      if (el) {
-        el.classList.remove('shake');
-        void el.offsetWidth; // reflow to restart animation
-        el.classList.add('shake');
-        el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
-      }
-      return;
+  const expectedId = CORRECT_ORDER[chain.length].id;
+  if (tileId !== expectedId) {
+    const el = document.querySelector(`[data-tile-id="${tileId}"]`);
+    if (el) {
+      el.classList.remove('shake');
+      void el.offsetWidth;
+      el.classList.add('shake');
+      el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
     }
-
-    const [tile] = hand.splice(idx, 1);
-    chain.push(tile);
+    return;
   }
+
+  chain.push(hand.splice(idx, 1)[0]);
   clearResult();
   render();
-  // 自动检查：所有骨牌放完后立即出结果
-  if (chain.length === CORRECT_ORDER.length) {
-    setTimeout(checkResult, 150); // 等渲染完毕再显示
-  }
+  if (chain.length === CORRECT_ORDER.length) setTimeout(checkResult, 150);
 }
 
 function moveTileToHand(tileId) {
   const idx = chain.findIndex(t => t.id === tileId);
   if (idx === -1) return;
-  const [tile] = chain.splice(idx, 1);
-  hand.push(tile);
+  hand.push(chain.splice(idx, 1)[0]);
   clearResult();
   render();
 }
 
-// ── Check ─────────────────────────────────────────────────────────────
+// ── Check & result ────────────────────────────────────────────────────
 function checkResult() {
   const correct = chain.every((tile, i) => tile.id === CORRECT_ORDER[i].id);
   if (correct) {
+    stopTimer();
+    document.getElementById('timerDisplay').classList.add('done');
     playSuccessSound();
-    showResult('🎉 ¡Perfecto! 春天→美丽→幸福→温柔→前行→快乐→希望→继续→永远→成功', 'correct');
+    // Build success chain string from words
+    const words = parseWords(wordInput.value).filter(w => [...w].length === 2);
+    const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+    const s = String(timerSeconds % 60).padStart(2, '0');
+    showResult(`🎉 ¡Perfecto！${words.join(' → ')}  ⏱ ${m}:${s}`, 'correct');
     document.getElementById('btnCheck').style.display = 'none';
-    document.querySelector('.game-subtitle').style.display = 'none';
-    document.querySelector('.hand-label').style.display = 'none';
+    document.getElementById('gameSubtitle').style.display = 'none';
+    document.getElementById('handLabel').style.display = 'none';
     document.getElementById('handArea').style.display = 'none';
   } else {
-    showResult('Algo está mal… intenta de nuevo. ¡Tú puedes!', 'wrong');
+    showResult('差一点！检查顺序再试一次 💪', 'wrong');
   }
 }
 
 document.getElementById('btnCheck').addEventListener('click', () => {
   if (chain.length !== CORRECT_ORDER.length) {
-    showResult('¡Faltan fichas! Coloca todas las fichas en la cadena.', 'wrong');
+    showResult('还有骨牌没放！把所有骨牌放入链条中。', 'wrong');
     return;
   }
   checkResult();
 });
-
-// ── Sonido de éxito (Web Audio API) ───────────────────────────────────
-function playSuccessSound() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const notes = [523, 659, 784, 1047]; // Do Mi Sol Do (acorde mayor)
-    notes.forEach((freq, i) => {
-      const osc  = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.type = 'sine';
-      osc.frequency.value = freq;
-      const start = ctx.currentTime + i * 0.13;
-      gain.gain.setValueAtTime(0, start);
-      gain.gain.linearRampToValueAtTime(0.22, start + 0.04);
-      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.5);
-      osc.start(start);
-      osc.stop(start + 0.55);
-    });
-  } catch (e) {}
-}
 
 function showResult(text, type) {
   const msg = document.getElementById('resultMsg');
   msg.textContent = text;
   msg.className = `result-msg show ${type}`;
 }
-
 function clearResult() {
   const msg = document.getElementById('resultMsg');
   msg.className = 'result-msg';
   msg.textContent = '';
 }
 
-// ── Reset ─────────────────────────────────────────────────────────────
-document.getElementById('btnReset').addEventListener('click', initGame);
+// ── Success sound ─────────────────────────────────────────────────────
+function playSuccessSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [523, 659, 784, 1047].forEach((freq, i) => {
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine'; osc.frequency.value = freq;
+      const t = ctx.currentTime + i * 0.13;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.22, t + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+      osc.start(t); osc.stop(t + 0.55);
+    });
+  } catch(e) {}
+}
+
+// ── Timer ─────────────────────────────────────────────────────────────
+let timerInterval = null, timerSeconds = 0;
+
+function startTimer() {
+  stopTimer();
+  timerSeconds = 0;
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    timerSeconds++;
+    updateTimerDisplay();
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+
+function updateTimerDisplay() {
+  const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+  const s = String(timerSeconds % 60).padStart(2, '0');
+  const el = document.getElementById('timerDisplay');
+  el.textContent = `⏱ ${m}:${s}`;
+}
+
+// ── Reset & init ──────────────────────────────────────────────────────
+document.getElementById('btnReset').addEventListener('click', () => {
+  document.getElementById('btnCheck').style.display = '';
+  document.getElementById('gameSubtitle').style.display = '';
+  document.getElementById('handLabel').style.display = '';
+  document.getElementById('handArea').style.display = '';
+  document.getElementById('timerDisplay').classList.remove('done');
+  initGame();
+});
 
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -760,9 +752,9 @@ function shuffle(arr) {
 function initGame() {
   hand  = shuffle([...CORRECT_ORDER]);
   chain = [];
-  selectedTile = null;
   clearResult();
   render();
+  startTimer();
 }
 
 // ── Stars ─────────────────────────────────────────────────────────────
@@ -770,21 +762,10 @@ const starsEl = document.getElementById('stars');
 for (let i = 0; i < 140; i++) {
   const s = document.createElement('div');
   s.className = 'star';
-  const size = Math.random() * 2.5 + 0.5;
-  s.style.cssText = [
-    `left:${Math.random()*100}%`,
-    `top:${Math.random()*100}%`,
-    `width:${size}px`,
-    `height:${size}px`,
-    `--d:${2 + Math.random()*5}s`,
-    `--o:${0.3 + Math.random()*0.65}`,
-    `animation-delay:${Math.random()*7}s`
-  ].join(';');
+  const sz = Math.random() * 2.5 + 0.5;
+  s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;width:${sz}px;height:${sz}px;--d:${2+Math.random()*5}s;--o:${0.3+Math.random()*0.65};animation-delay:${Math.random()*7}s`;
   starsEl.appendChild(s);
 }
-
-// ── Init ──────────────────────────────────────────────────────────────
-initGame();
 </script>
 </body>
 </html>
